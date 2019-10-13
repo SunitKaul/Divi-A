@@ -1,0 +1,102 @@
+/**
+ * DO NOT ADD / EDIT ANYTHING HERE
+ *
+ * Any component related stuff goes into the directory of the component.
+ *
+ * This file duplicates classes of Toolset Blocks for the case that Toolset Blocks is not active -> Views Beta.
+ * In the future TB will be shipped with Views, than this file can be deleted.
+ *
+ * @todo GET RID OF THIS and rename classes to not use Toolset blocks prefix (tb-).
+ */
+.tb-row-block {
+	display: flex;
+	justify-content: space-between;
+
+	&.tb-row-block-columns-2 {
+		> div {
+			width: 50%;
+		}
+	}
+
+	&.tb-row-block-icon-ahead {
+		> div:first-child {
+			margin-right: 2px;
+			display: flex;
+			align-items: center;
+			height: 28px;
+		}
+
+		> div:last-child {
+			width: 100%;
+		}
+	}
+	> div,
+	> label {
+		margin: 0 5px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	+ .tb-control-description {
+		margin-top: 2px;
+	}
+}
+
+.tb-control-spacing {
+	margin: 0 0 1.5em 0;
+
+	> label {
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	&:last-child {
+		margin-bottom: 1em;
+	}
+
+	.components-base-control {
+		margin-bottom: 0.5em !important;
+	}
+}
+
+.tb-no-outline:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.tb-no-margin {
+	margin: 0 !important;
+}
+
+.tb-no-padding {
+	padding: 0 !important;
+}
+
+.tb-control-label {
+	display: block;
+	margin-bottom: 4px;
+}
+
+// Used for switching between edit all/each border&border radius
+.tb-link-button {
+	svg {
+		width: 22px;
+		margin-bottom: 4px;
+		path {
+			transform: rotate(45deg) translate(4px, -11px);
+		}
+	}
+}
+
+.tb-input-disabled input {
+	cursor: not-allowed;
+	outline: none !important;
+	box-shadow: none !important;
+	color: #ccc !important;
+}

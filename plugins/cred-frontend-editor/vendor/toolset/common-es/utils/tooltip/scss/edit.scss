@@ -1,0 +1,17 @@
+.tb-tooltip {
+	position: fixed;
+	display: none;
+	text-decoration: none;
+	background: #444850;
+	color: #fff;
+	padding: 10px;
+	border-radius: 5px;
+	z-index: 1000;
+
+	&.tb-tooltip-active {
+		display: block;
+
+		top: 100px;
+		left: 400px;
+	}
+}

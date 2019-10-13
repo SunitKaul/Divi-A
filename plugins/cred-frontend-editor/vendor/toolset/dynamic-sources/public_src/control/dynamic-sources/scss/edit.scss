@@ -1,0 +1,23 @@
+$gray: #dedede;
+
+.wp-block-toolset-blocks-wrapper {
+	.empty-dynamic-source-content-notice {
+		color: $gray;
+		font-style: italic;
+		min-height: 60px;
+		display: flex;
+		align-items: center;
+	}
+}
+
+.is-selected .wp-block-toolset-blocks-wrapper.dynamic {
+	.tb-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: rgba(244, 244, 244, 0.7);
+		min-height: initial;
+	}
+}

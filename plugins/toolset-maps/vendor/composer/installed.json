@@ -1,0 +1,233 @@
+[
+    {
+        "name": "composer/installers",
+        "version": "v1.7.0",
+        "version_normalized": "1.7.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/composer/installers.git",
+            "reference": "141b272484481432cda342727a427dc1e206bfa0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/composer/installers/zipball/141b272484481432cda342727a427dc1e206bfa0",
+            "reference": "141b272484481432cda342727a427dc1e206bfa0",
+            "shasum": ""
+        },
+        "require": {
+            "composer-plugin-api": "^1.0"
+        },
+        "replace": {
+            "roundcube/plugin-installer": "*",
+            "shama/baton": "*"
+        },
+        "require-dev": {
+            "composer/composer": "1.0.*@dev",
+            "phpunit/phpunit": "^4.8.36"
+        },
+        "time": "2019-08-12T15:00:31+00:00",
+        "type": "composer-plugin",
+        "extra": {
+            "class": "Composer\\Installers\\Plugin",
+            "branch-alias": {
+                "dev-master": "1.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Composer\\Installers\\": "src/Composer/Installers"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Kyle Robinson Young",
+                "email": "kyle@dontkry.com",
+                "homepage": "https://github.com/shama"
+            }
+        ],
+        "description": "A multi-framework Composer library installer",
+        "homepage": "https://composer.github.io/installers/",
+        "keywords": [
+            "Craft",
+            "Dolibarr",
+            "Eliasis",
+            "Hurad",
+            "ImageCMS",
+            "Kanboard",
+            "Lan Management System",
+            "MODX Evo",
+            "Mautic",
+            "Maya",
+            "OXID",
+            "Plentymarkets",
+            "Porto",
+            "RadPHP",
+            "SMF",
+            "Thelia",
+            "Whmcs",
+            "WolfCMS",
+            "agl",
+            "aimeos",
+            "annotatecms",
+            "attogram",
+            "bitrix",
+            "cakephp",
+            "chef",
+            "cockpit",
+            "codeigniter",
+            "concrete5",
+            "croogo",
+            "dokuwiki",
+            "drupal",
+            "eZ Platform",
+            "elgg",
+            "expressionengine",
+            "fuelphp",
+            "grav",
+            "installer",
+            "itop",
+            "joomla",
+            "known",
+            "kohana",
+            "laravel",
+            "lavalite",
+            "lithium",
+            "magento",
+            "majima",
+            "mako",
+            "mediawiki",
+            "modulework",
+            "modx",
+            "moodle",
+            "osclass",
+            "phpbb",
+            "piwik",
+            "ppi",
+            "puppet",
+            "pxcms",
+            "reindex",
+            "roundcube",
+            "shopware",
+            "silverstripe",
+            "sydes",
+            "symfony",
+            "typo3",
+            "wordpress",
+            "yawik",
+            "zend",
+            "zikula"
+        ]
+    },
+    {
+        "name": "rdlowrey/auryn",
+        "version": "v1.4.2",
+        "version_normalized": "1.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/rdlowrey/auryn.git",
+            "reference": "8c4dc07943599ba84f4f89eab8cf43efeef80395"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/rdlowrey/auryn/zipball/8c4dc07943599ba84f4f89eab8cf43efeef80395",
+            "reference": "8c4dc07943599ba84f4f89eab8cf43efeef80395",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "athletic/athletic": "~0.1",
+            "fabpot/php-cs-fixer": "~1.9",
+            "phpunit/phpunit": "^4.7"
+        },
+        "time": "2017-05-15T06:26:46+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Auryn\\": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Dan Ackroyd",
+                "email": "Danack@basereality.com",
+                "homepage": "http://www.basereality.com",
+                "role": "Developer"
+            },
+            {
+                "name": "Levi Morrison",
+                "email": "levim@php.net",
+                "homepage": "http://morrisonlevi.github.com/",
+                "role": "Developer"
+            },
+            {
+                "name": "Daniel Lowrey",
+                "email": "rdlowrey@gmail.com",
+                "homepage": "https://github.com/rdlowrey",
+                "role": "Creator / Main Developer"
+            }
+        ],
+        "description": "Auryn is a dependency injector for bootstrapping object-oriented PHP applications.",
+        "homepage": "https://github.com/rdlowrey/auryn",
+        "keywords": [
+            "dependency injection",
+            "dic",
+            "ioc"
+        ]
+    },
+    {
+        "name": "toolset/dynamic-sources",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "ssh://git@git.onthegosystems.com:10022/toolset/dynamic-sources.git",
+            "reference": "4c0995122baef1269d5f6267591b6b8cb6283033"
+        },
+        "require": {
+            "php": ">=5.6.0",
+            "rdlowrey/auryn": "^1.4"
+        },
+        "require-dev": {
+            "otgs/unit-tests-framework": "~1.2.0",
+            "roave/security-advisories": "dev-master"
+        },
+        "time": "2019-09-03T09:02:51+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "exclude-from-classmap": [
+                "/server/"
+            ],
+            "psr-4": {
+                "Toolset\\DynamicSources\\": "server/"
+            }
+        },
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Konstantinos Galanakis",
+                "email": "konstantinos.g@onthegosystems.com"
+            }
+        ],
+        "description": "Toolset Dynamic Sources API for blocks",
+        "keywords": [
+            "dynamic sources",
+            "gutenberg blocks",
+            "wordpress"
+        ]
+    }
+]

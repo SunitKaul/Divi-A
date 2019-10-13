@@ -1,0 +1,62 @@
+@import "../../../../scss/variable/colors";
+
+.tb-icon-selector {
+
+	&__content {
+		min-height: 400px;
+		padding: 15px;
+	}
+
+	&__list {
+		display: grid;
+		max-height: 250px;
+		overflow: auto;
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-column-gap: 5px;
+		grid-row-gap: 5px;
+		margin-bottom: 15px;
+
+	}
+
+	&__icon {
+		font-size: 18px;
+
+		&::before {
+			content: attr(data-font-code);
+			display: block;
+			text-align: center;
+			width: 100%;
+		}
+	}
+
+	&__search {
+		position: relative;
+		::after {
+			content: "\f179";
+			font-family: dashicons, sans-serif;
+			position: absolute;
+			right: 5px;
+			bottom: 7px;
+			font-size: 20px;
+			color: $gray;
+		}
+	}
+
+	&__notice {
+		margin: 0 0 1.5em 0;
+	}
+
+	&__button {
+		font-size: 25px;
+		background: $gray !important;
+		border-radius: 3px;
+		min-width: 40px;
+		min-height: 20px;
+
+		&::before {
+			content: attr(data-font-code);
+			margin: auto;
+			padding: 10px;
+		}
+	}
+}

@@ -1,0 +1,117 @@
+/**
+ * Padding + Margin editor styles
+ *
+ * @since 1.0.0
+ */
+
+@import "../../../../scss/variable/colors";
+
+$color__margin: $gray-light;
+$color__margin-border: $gray;
+$color__border: #006a95;
+$color__input--focus: $white;
+$color__padding: #c8e1fa;
+$color__content: #0085ba;
+$color__label: $gray-dark;
+
+@mixin label {
+	content: attr(data-label);
+	position: absolute;
+	left: 0;
+	font-family: sans-serif;
+	font-size: 7pt;
+	top: 0;
+	color: $color__label;
+	padding: 2px;
+}
+
+.wp-block-toolset-blocks-padding-margin {
+
+	box-sizing: border-box;
+	border: 1px dashed $color__margin-border;
+	background-color: $color__margin;
+
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-gap: 0;
+	grid-template-areas:
+		"a a a a a"
+		". b b b ."
+		"c d i e f"
+		". g g g ."
+		"h h h h h";
+	align-items: start;
+
+	&__cell {
+		position: relative;
+		padding: 5px 0;
+	}
+	&__item1 {
+		text-align: center;
+		grid-area: a;
+
+		&::before {
+			@include label;
+		}
+	}
+	&__item2 {
+		text-align: center;
+		grid-area: b;
+		border: 3px solid $color__border;
+		border-bottom: 0;
+		background: $color__padding;
+
+		&::before {
+			@include label;
+		}
+	}
+	&__item3 {
+		text-align: right;
+		grid-area: c;
+	}
+	&__item4 {
+		grid-area: d;
+		border-left: 3px solid $color__border;
+		background: $color__padding;
+	}
+	&__item5 {
+		text-align: right;
+		grid-area: e;
+		border-right: 3px solid $color__border;
+		background: $color__padding;
+	}
+	&__item6 {
+		grid-area: f;
+	}
+	&__item7 {
+		grid-area: g;
+		text-align: center;
+		border: 3px solid $color__border;
+		border-top: 0;
+		background: $color__padding;
+	}
+	&__item8 {
+		grid-area: h;
+		text-align: center;
+	}
+	&__content {
+		grid-area: i;
+		background: $color__content;
+		border: 1px solid $color__border;
+		align-self: stretch;
+	}
+	& input {
+		width: 40px;
+		text-align: center;
+		border: 0 !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		background: transparent !important;
+		border-radius: 0 !important;
+	}
+	& input:focus {
+		background: $color__input--focus;
+		outline: none !important;
+		box-shadow: none !important;
+	}
+}

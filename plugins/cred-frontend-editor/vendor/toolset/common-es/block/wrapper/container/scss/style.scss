@@ -1,0 +1,13 @@
+.tb-container {
+	p:first-child {
+		margin-top: 0 !important;
+	}
+	p:last-child {
+		margin-bottom: 0 !important;
+	}
+
+	figure {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}

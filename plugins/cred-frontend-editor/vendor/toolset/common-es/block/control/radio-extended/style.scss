@@ -1,0 +1,17 @@
+.components-radio-control {
+	display: flex;
+	flex-direction: column;
+	&__option:not(:last-child) {
+		margin-bottom: 4px;
+	}
+
+	&__input[type="radio"] {
+		margin-top: 0;
+		margin-right: 6px;
+	}
+
+	&__help-icon::before {
+		content: "\f223";
+		font-family: dashicons, sans-serif;
+	}
+}

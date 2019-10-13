@@ -1,0 +1,43 @@
+@import "variable/colors";
+
+/* Temporary added scss, which duplicates css of Toolset Blocks */
+@import "duplicated";
+
+/* General Scss - all component specific style goes into the component itself. */
+.tces-control-background-gradient-type {
+	width: 100%;
+
+	button {
+		width: 50%;
+	}
+}
+
+.tces-row-fixed-height {
+	height: 40px;
+	margin-top: 20px;
+	margin-bottom: 24px;
+}
+
+.tces-row {
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.tces-image-select .components-button + .components-button {
+	margin-top: 1em;
+}
+
+.tces-font-size-picker .components-font-size-picker__selector,
+.tces-font-style button.components-button {
+	z-index: initial;
+}
+
+.tces-classes {
+	.components-form-token-field__help {
+		display: none;
+	}
+	.components-base-control__help {
+		margin-top: 10px;
+	}
+}
