@@ -300,7 +300,7 @@ function learndash_all_group_leader_ids() {
 function learndash_all_group_leaders() {
 	$transient_key = "learndash_group_leaders";
 	//$group_user_objects = get_transient( $transient_key );
-	$group_user_objects = learndash_get_valid_transient( $transient_key );
+	$group_user_objects = LDLMS_Transients::get( $transient_key );
 	if ( $group_user_objects === false ) {
 	
 		$user_query_args = array(
@@ -316,7 +316,7 @@ function learndash_all_group_leaders() {
 			$group_user_objects = array();
 		}
 		
-		set_transient( $transient_key, $group_user_objects, MINUTE_IN_SECONDS );
+		LDLMS_Transients::set( $transient_key, $group_user_objects, MINUTE_IN_SECONDS );
 	}
 	return $group_user_objects;
 }
@@ -411,7 +411,7 @@ function learndash_group_enrolled_courses( $group_id = 0, $bypass_transient = fa
 		$transient_key = "learndash_group_courses_" . $group_id;
 		
 		if (!$bypass_transient) {
-			$group_courses_ids_transient = learndash_get_valid_transient( $transient_key );
+			$group_courses_ids_transient = LDLMS_Transients::get( $transient_key );
 	
 		} else {
 			$group_courses_ids_transient = false;
@@ -421,7 +421,7 @@ function learndash_group_enrolled_courses( $group_id = 0, $bypass_transient = fa
 			$sql_str = $wpdb->prepare("SELECT post_id FROM ". $wpdb->postmeta ." as postmeta INNER JOIN ". $wpdb->posts ." as posts ON posts.ID=postmeta.post_id
 				WHERE posts.post_type = %s AND posts.post_status = %s AND meta_key = %s", 'sfwd-courses', 'publish', 'learndash_group_enrolled_' . $group_id);
 			$group_courses_ids = $wpdb->get_col( $sql_str );
-			set_transient( $transient_key, $group_courses_ids, MINUTE_IN_SECONDS );
+			LDLMS_Transients::set( $transient_key, $group_courses_ids, MINUTE_IN_SECONDS );
 			
 		} else {
 			$group_courses_ids = $group_courses_ids_transient;
@@ -731,7 +731,7 @@ function learndash_get_users_group_ids( $user_id = 0, $bypass_transient = false 
 		$transient_key = "learndash_user_groups_" . $user_id;
 
 		if (!$bypass_transient) {
-			$user_group_ids_transient = learndash_get_valid_transient( $transient_key );
+			$user_group_ids_transient = LDLMS_Transients::get( $transient_key );
 		} else {
 			$user_group_ids_transient = false;
 		}
@@ -748,7 +748,7 @@ function learndash_get_users_group_ids( $user_id = 0, $bypass_transient = false 
 				$user_group_ids = $wpdb->get_col( $sql_str );
 			}
 
-			set_transient( $transient_key, $user_group_ids, MINUTE_IN_SECONDS );
+			LDLMS_Transients::set( $transient_key, $user_group_ids, MINUTE_IN_SECONDS );
 			
 		} else {
 			$user_group_ids = $user_group_ids_transient;
@@ -802,7 +802,7 @@ function learndash_get_course_groups( $course_id = 0, $bypass_transient = false 
 	if ( !empty( $course_id ) ) {
 		$transient_key = "learndash_course_groups_" . $course_id;
 		if (!$bypass_transient) {
-			$course_groups_ids_transient = learndash_get_valid_transient( $transient_key );
+			$course_groups_ids_transient = LDLMS_Transients::get( $transient_key );
 		} else {
 			$course_groups_ids_transient = false;
 		}
@@ -819,7 +819,7 @@ function learndash_get_course_groups( $course_id = 0, $bypass_transient = false 
 				
 				$sql_str = "SELECT ID FROM $wpdb->posts WHERE post_type='groups' AND post_status = 'publish' AND ID IN (" . implode( ',', $col ) . ')';
 				$course_groups_ids = $wpdb->get_col( $sql_str );
-				set_transient( $transient_key, $course_groups_ids, MINUTE_IN_SECONDS );
+				LDLMS_Transients::set( $transient_key, $course_groups_ids, MINUTE_IN_SECONDS );
 			}
 		} else {
 			$course_groups_ids = $course_groups_ids_transient;
@@ -899,7 +899,7 @@ function learndash_get_groups_users( $group_id, $bypass_transient = false ) {
 	
 	if (!$bypass_transient) {
 		$transient_key = "learndash_group_users_" . $group_id;
-		$group_users_objects = learndash_get_valid_transient( $transient_key );
+		$group_users_objects = LDLMS_Transients::get( $transient_key );
 	} else {
 		$group_users_objects = false;
 	}
@@ -932,7 +932,7 @@ function learndash_get_groups_users( $group_id, $bypass_transient = false ) {
 		}
 		
 		if (!$bypass_transient) {
-			set_transient( $transient_key, $group_users_objects, MINUTE_IN_SECONDS );
+			LDLMS_Transients::set( $transient_key, $group_users_objects, MINUTE_IN_SECONDS );
 		}
 	}
 
@@ -1031,7 +1031,7 @@ function learndash_get_groups_administrators( $group_id, $bypass_transient = fal
 	$transient_key = "learndash_group_leaders_" . $group_id;
 
 	if ( !$bypass_transient ) {
-		$group_user_objects = learndash_get_valid_transient( $transient_key );
+		$group_user_objects = LDLMS_Transients::get( $transient_key );
 	} else {
 		$group_user_objects = false;
 	}
@@ -1058,7 +1058,7 @@ function learndash_get_groups_administrators( $group_id, $bypass_transient = fal
 		}
 		
 		if ( !$bypass_transient ) {
-			set_transient( $transient_key, $group_user_objects, MINUTE_IN_SECONDS );
+			LDLMS_Transients::set( $transient_key, $group_user_objects, MINUTE_IN_SECONDS );
 		}
 	}
 	

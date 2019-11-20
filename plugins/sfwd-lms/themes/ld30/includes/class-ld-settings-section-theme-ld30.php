@@ -35,6 +35,19 @@ if ( ( class_exists( 'LearnDash_Theme_Settings_Section' ) ) && ( ! class_exists(
 			// Set Associated Theme ID
 			$this->settings_theme_key = 'ld30';
 
+			$ld30_colors_defs = array(
+				'LD_30_COLOR_PRIMARY'      => '#00a2e8',
+				'LD_30_COLOR_SECONDARY'    => '#019e7c',
+				'LD_30_COLOR_TERTIARY'     => '#ffd200',
+			);
+
+			foreach ( $ld30_colors_defs as $definition => $value ) {
+				if ( ! defined( $definition ) ) {
+					define( $definition, $value );
+				}
+			}
+
+
 			parent::__construct();
 		}
 
@@ -65,7 +78,7 @@ if ( ( class_exists( 'LearnDash_Theme_Settings_Section' ) ) && ( ! class_exists(
 			}
 
 			if ( ( ! isset( $this->setting_option_values['color_secondary'] ) ) || ( empty( $this->setting_option_values['color_secondary'] ) ) ) {
-				$this->setting_option_values['color_secondary'] = '';
+				$this->setting_option_values['color_secondary'] = ''; 
 			}
 
 			if ( ( ! isset( $this->setting_option_values['color_tertiary'] ) ) || ( empty( $this->setting_option_values['color_tertiary'] ) ) ) {
@@ -93,21 +106,33 @@ if ( ( class_exists( 'LearnDash_Theme_Settings_Section' ) ) && ( ! class_exists(
 					'type'      => 'colorpicker',
 					'label'     => esc_html__( 'Accent Color', 'learndash' ),
 					'help_text' => esc_html__( 'Main color used throughout the theme (buttons, action items, and highlights).', 'learndash' ),
-					'value'     => $this->setting_option_values['color_primary'],
+					'value'     => ! empty( $this->setting_option_values['color_primary'] ) ? $this->setting_option_values['color_primary'] : LD_30_COLOR_PRIMARY,
+					'validate_callback' => array( $this, 'validate_section_field_colors' ),
+					'validate_args'     => array(
+						'allow_empty' => 1,
+					),
 				),
 				'color_secondary'    => array(
 					'name'      => 'color_secondary',
 					'type'      => 'colorpicker',
 					'label'     => esc_html__( 'Progress Color', 'learndash' ),
 					'help_text' => esc_html__( 'Color used for all successful progress-related items (completed items, certificates, and progress bars).', 'learndash' ),
-					'value'     => $this->setting_option_values['color_secondary'],
+					'value'     => ! empty( $this->setting_option_values['color_secondary'] ) ? $this->setting_option_values['color_secondary'] : LD_30_COLOR_SECONDARY,
+					'validate_callback' => array( $this, 'validate_section_field_colors' ),
+					'validate_args'     => array(
+						'allow_empty' => 1,
+					),
 				),
 				'color_tertiary'     => array(
 					'name'      => 'color_tertiary',
 					'type'      => 'colorpicker',
 					'label'     => esc_html__( 'Notifications, Warnings, etc...', 'learndash' ),
 					'help_text' => esc_html__( 'This color is used when there are warning, important messages.', 'learndash' ),
-					'value'     => $this->setting_option_values['color_tertiary'],
+					'value'     => ! empty( $this->setting_option_values['color_tertiary'] ) ? $this->setting_option_values['color_tertiary'] : LD_30_COLOR_TERTIARY,
+					'validate_callback' => array( $this, 'validate_section_field_colors' ),
+					'validate_args'     => array(
+						'allow_empty' => 1,
+					),
 				),
 				'focus_mode_enabled' => array(
 					'name'      => 'focus_mode_enabled',
@@ -210,6 +235,40 @@ if ( ( class_exists( 'LearnDash_Theme_Settings_Section' ) ) && ( ! class_exists(
 			return $val;
 		}
 
+		/**
+		 * Validate color selection settings fields.
+		 *
+		 * @param string $val Value to be validated.
+		 * @param string $key settings fields key.
+		 * @param array  $args Settings field args array.
+		 *
+		 * @return integer $val.
+		 */
+		public function validate_section_field_colors( $val, $key, $args = array()) {
+			switch( $key ) {
+				case 'color_primary':
+					if ( LD_30_COLOR_PRIMARY == $val ) {
+						$val = '';
+					}
+					break;
+
+				case 'color_secondary':
+					if ( LD_30_COLOR_SECONDARY == $val ) {
+						$val = '';
+					}
+					break;
+
+				case 'color_tertiary':
+					if ( LD_30_COLOR_TERTIARY == $val ) {
+						$val = '';
+					}
+					break;
+				
+				default:
+					break;	
+			}
+			return $val;
+		}
 	}
 }
 

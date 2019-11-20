@@ -65,8 +65,7 @@ if ( ( class_exists( 'LearnDash_Shortcodes_Section' ) ) && ( ! class_exists( 'Le
 				),
 			);
 
-			if ( ( ! isset( $this->fields_args['post_type'] ) ) || ( ( 'sfwd-courses' !== $this->fields_args['post_type'] ) && ( 'sfwd-lessons' !== $this->fields_args['post_type'] ) && ( 'sfwd-topic' !== $this->fields_args['post_type'] ) && ( 'sfwd-certificates' !== $this->fields_args['post_type'] ) ) ) {
-
+			if ( ( ! isset( $this->fields_args['typenow'] ) ) || ( in_array( $this->fields_args['typenow'], learndash_get_post_types( 'course' ) ) ) ) {
 				$this->shortcodes_option_fields['course_id'] = array(
 					'id'        => $this->shortcodes_section_key . '_course_id',
 					'name'      => 'course_id',

@@ -829,8 +829,6 @@ function learndash_assignment_inline_actions( $actions, $post ) {
 
 add_filter( 'post_row_actions', 'learndash_assignment_inline_actions', 10, 2 );
 
-
-
 /**
  * Restrict assignment listings view to group leader only
  *
@@ -865,6 +863,7 @@ function learndash_restrict_assignment_listings( $query ) {
 
 			$group_ids  = learndash_get_administrators_group_ids( $user_id );
 			$course_ids = array();
+			$lesson_ids = array();
 			$user_ids   = array();
 
 			if ( ! empty( $group_ids ) && is_array( $group_ids ) ) {
@@ -883,31 +882,80 @@ function learndash_restrict_assignment_listings( $query ) {
 				}
 			}
 
-			if ( ! empty( $course_ids ) && count( $course_ids ) ) {
+			if ( ! empty( $course_ids ) ) {
+				$course_ids = array_map( 'absint', $course_ids );
+			
+				if ( ( isset( $_GET['course_id'] ) ) && ( ! empty( $_GET['course_id'] ) ) ) {
+					$course_id = absint( $_GET['course_id'] );
+					if ( in_array( $course_id, $course_ids ) ) {
+						$course_ids = array( $course_id );
 
-				if ( ! isset( $q_vars['meta_query'] ) ) {
-					$q_vars['meta_query'] = array();
+						if ( ( isset( $_GET['lesson_id'] ) ) && ( ! empty( $_GET['lesson_id'] ) ) ) {
+							$lesson_id = absint( $_GET['lesson_id'] );
+							$lesson_courses = learndash_get_courses_for_step( $lesson_id, true );
+							if ( ! is_array( $lesson_courses ) ) {
+								$lesson_courses = array();
+							}
+							if ( ( ! empty( $lesson_courses ) ) && ( isset( $lesson_courses[ $course_id ] ) ) ) {
+								$lesson_ids = array( $lesson_id );
+							} else {
+								$course_ids = array();
+								$lesson_ids = array();
+							}
+						}
+
+					} else {
+						$course_ids = array();
+					}
 				}
-
-				$q_vars['meta_query'][] = array(
-					'key'     => 'course_id',
-					'value'   => $course_ids,
-					'compare' => 'IN',
-				);
 			}
 
-			if ( ! empty( $user_ids ) && count( $user_ids ) ) {
+			if ( ( empty( $course_ids ) ) && ( empty( $user_ids ) ) ) {
+				$course_ids = array(0);
+				$user_ids = array(0);
+			}
+
+			if ( ! isset( $q_vars['meta_query'] ) ) {
+				$q_vars['meta_query'] = array();
+			}
+
+			$q_vars['meta_query'][] = array(
+				'key'     => 'course_id',
+				'value'   => $course_ids,
+				'compare' => 'IN',
+			);
+
+			if ( ( ! empty( $course_ids ) ) && ( ! empty( $lesson_ids ) ) ) {
+				$lesson_ids = array_map( 'absint', $lesson_ids );
+				$q_vars['meta_query'][] = array(
+					'key'     => 'lesson_id',
+					'value'   => $lesson_ids,
+					'compare' => 'IN',
+				);
+				$q_vars['meta_query']['relation'] = 'AND';
+			}
+			
+			if ( ! empty( $user_ids ) ) {
+				$user_ids = array_map( 'absint', $user_ids );
+
+				if ( ( isset( $_GET['author'] ) ) && ( ! empty( $_GET['author'] ) ) ) {
+					if ( in_array( absint( $_GET['author'] ), $user_ids ) ) {
+						$user_ids = array( absint( $_GET['author'] ) );
+					} else {
+						$user_ids = array();
+					}
+				} 
+			}
+
+			if ( ! empty( $user_ids ) ) {
 				$q_vars['author__in'] = $user_ids;
 			} else {
-				$q_vars['author__in'] = - 2;
+				$q_vars['author__in'] = array(0);
 			}
 		}
 	}
 }
-
 add_filter( 'parse_query', 'learndash_restrict_assignment_listings' );
-
-
 
 /**
  * Check if assignment is completed

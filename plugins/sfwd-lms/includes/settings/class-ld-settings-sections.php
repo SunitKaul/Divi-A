@@ -241,7 +241,12 @@ if ( ! class_exists( 'LearnDash_Settings_Section' ) ) {
 			$this->settings_fields_loaded = true;
 
 			foreach ( $this->setting_option_fields as &$setting_option_field ) {
-
+				if ( ! isset( $setting_option_field['type'] ) ) {
+					continue;
+					//error_log('setting_option_field[type]['. $setting_option_field['type'] .']');
+					//error_log('setting_option_field<pre>'. print_r($setting_option_field, true) .'</pre>');
+				}
+				
 				$field_instance = LearnDash_Settings_Fields::get_field_instance( $setting_option_field['type'] );
 				if ( ( $field_instance ) && ( 'LearnDash_Settings_Fields' === get_parent_class( $field_instance ) ) ) {
 					$setting_option_field['setting_option_key'] = $this->setting_option_key;
@@ -319,7 +324,10 @@ if ( ! class_exists( 'LearnDash_Settings_Section' ) ) {
 				);
 
 				foreach ( $this->setting_option_fields as $setting_option_field ) {
-
+					if ( ! isset( $setting_option_field['name'] ) ) {
+						continue;
+					}
+					
 					add_settings_field(
 						$setting_option_field['name'],
 						$setting_option_field['label'],
@@ -385,6 +393,14 @@ if ( ! class_exists( 'LearnDash_Settings_Section' ) ) {
 		 */
 		public function section_update_option( $old_value = '', $value = '', $section_key = '' ) {
 			if ( ( ! empty( $section_key ) ) && ( $section_key === $this->setting_option_key ) ) {
+				// When a section values change we update our internal set and also trigger reload fresh.
+
+				if ( ! defined( 'LEARNDASH_SETTINGS_UPDATING' ) ) {
+					define( 'LEARNDASH_SETTINGS_UPDATING', true );
+				}
+				$this->setting_option_values = $value;
+				$this->settings_values_loaded = false;
+				$this->settings_fields_loaded = false;
 				return true;
 			}
 		}
@@ -497,7 +513,7 @@ if ( ! class_exists( 'LearnDash_Settings_Section' ) ) {
 
 				echo '</div>';
 
-				do_action( 'learndash_section_aafter', $this->settings_section_key, $this->settings_screen_id );
+				do_action( 'learndash_section_after', $this->settings_section_key, $this->settings_screen_id );
 			}
 		}
 

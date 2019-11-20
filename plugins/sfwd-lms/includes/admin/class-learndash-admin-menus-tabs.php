@@ -413,7 +413,7 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 				*
 				* @param  string LD menu parent slug 'learndash-lms'.
 				*/
-				do_action( 'learnadash_admin_menu', 'learndash-lms' );
+				do_action( 'learndash_admin_menu', 'learndash-lms' );
 			}
 
 			global $learndash_post_types;
@@ -1053,6 +1053,7 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 					'points'                             => esc_html__( 'points', 'learndash' ),
 					'edit_answer'                        => esc_html__( 'Click here to edit the answer', 'learndash' ),
 					'update_answer'                      => esc_html__( 'Update Answer', 'learndash' ),
+					'answer_missing'                     => esc_html__( 'Answer is missing', 'learndash' ),
 					'allow_html'                         => esc_html__( 'Allow HTML', 'learndash' ),
 					'correct'                            => esc_html__( 'Correct', 'learndash' ),
 					'correct_1st'                        => wp_kses_post( _x( '1<sup>st</sup>', 'First sort answer correct', 'learndash' ) ),
@@ -1121,7 +1122,11 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 						'section-heading' => esc_html__( 'Add Section Heading', 'learndash' ),
 					),
 					'move_up'                            => esc_html_x( 'Move up', 'Move the current element up in the builder interface', 'learndash' ),
-					'question_empty'                     => esc_html_x( 'The question is empty.', 'Warning when no question was entered', 'learndash' ),
+					'question_empty'                     => sprintf(
+						/* translators: placeholders: question */
+						esc_html_x( 'The %s is empty.', 'Warning when no question was entered', 'learndash' ),
+						learndash_get_custom_label_lower( 'question' )
+					),
 					'move_down'                          => esc_html_x( 'Move down', 'Move the current element down in the builder interface', 'learndash' ),
 					'rename'                             => esc_html_x( 'Rename', 'Rename the current element in the builder interface', 'learndash' ),
 					'search_element_labels'              => array(
@@ -1233,7 +1238,11 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 						LearnDash_Custom_Label::get_label( 'quiz' ),
 						LearnDash_Custom_Label::get_label( 'questions' )
 					),
-					'question_empty'                     => esc_html( 'The question is empty, click here to edit it.', 'learndash' ),
+					'question_empty_edit'                => sprintf(
+						/* translators: placeholders: question */
+						esc_html_x( 'The %s is empty, click here to edit it.', 'Warning when no question was entered', 'learndash' ),
+						learndash_get_custom_label_lower( 'question' )
+					),
 					'unsaved_chages'                     => esc_html( 'You have unsaved changes. If you proceed, they will be lost.', 'learndash' ),
 					'manage_questions_builder'           => sprintf(
 						/* translators: placeholders: Questions */
@@ -1543,6 +1552,18 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 							$header_data['back_to_url'] = get_edit_post_link( absint( $_GET['post_id'] ) );
 							$header_data['currentTab']  = $screen->id;
 						}
+					} else {
+						// Quiz Import.Export page.
+						$header_data['currentTab'] = 'import-export';
+						$header_data['tabs'] = array(
+							array(
+								'id'      => $header_data['currentTab'],
+								'name'    => 'Import/Export Page',
+								'link'    => admin_url( 'admin.php?page=ldAdvQuiz' ),
+								'isExternal' => 'true',
+								'actions' => array(),
+							),
+				);
 					}
 
 					if ( ( isset( $_GET['post'] ) ) && ( ! empty( $_GET['post'] ) ) ) {
@@ -1559,7 +1580,37 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 									),
 									'link'       => add_query_arg( 'quiz_id', absint( $_GET['post'] ), admin_url( 'admin.php?page=learndash_data_upgrades' ) ),
 									'isExternal' => 'true',
-								),
+								)
+							)
+						);
+
+						if ( current_user_can('wpProQuiz_export') ) {
+
+							$action_menu = array_merge(
+								$action_menu,
+								array(
+									array(
+										'title'      => sprintf(
+											// translators: placeholder: Quiz.
+											esc_html_x( 'Export %s', 'placeholder: Quiz', 'learndash' ),
+											LearnDash_Custom_Label::get_label( 'quiz' )
+										),
+										'link'       => add_query_arg(
+											array(
+												'page'       => 'ldAdvQuiz',
+												'quiz_id'    => absint( $_GET['post'] ),
+											),
+											admin_url( 'admin.php' )
+										),
+										'isExternal' => 'true',
+									)
+								)
+							);
+						}
+
+						$action_menu = array_merge(
+							$action_menu,
+							array(
 								array(
 									'title'      => esc_html__( 'Statistics', 'learndash' ),
 									'link'       => add_query_arg(
@@ -1616,23 +1667,27 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 						);
 					}
 
-					$header_data['tabs'] = array_merge(
-						$header_data['tabs'],
-						array(
-							array(
-								'id'                  => $screen_post_type . '-settings',
-								'name'                => esc_html__( 'Settings', 'learndash' ),
-								'metaboxes'           => [ 'sfwd-courses', 'learndash-course-display-content-settings', 'learndash-course-access-settings', 'learndash-course-navigation-settings', 'learndash-course-grid-meta-box' ],
-								'showDocumentSidebar' => 'false',
-							),
-							array(
-								'id'                  => 'learndash_course_groups',
-								'name'                => esc_html__( 'Groups', 'learndash' ),
-								'metaboxes'           => [ 'learndash_course_groups' ],
-								'showDocumentSidebar' => 'false',
-							),
-						)
-					);
+					if ( current_user_can( 'edit_groups' ) ) {
+						if ( true === apply_filters( 'learndash_show_metabox_course_groups', true ) ) {
+							$header_data['tabs'] = array_merge(
+								$header_data['tabs'],
+								array(
+									array(
+										'id'                  => $screen_post_type . '-settings',
+										'name'                => esc_html__( 'Settings', 'learndash' ),
+										'metaboxes'           => [ 'sfwd-courses', 'learndash-course-display-content-settings', 'learndash-course-access-settings', 'learndash-course-navigation-settings', 'learndash-course-users-settings', 'learndash-course-grid-meta-box' ],
+										'showDocumentSidebar' => 'false',
+									),
+									array(
+										'id'                  => 'learndash_course_groups',
+										'name'                => esc_html__( 'Groups', 'learndash' ),
+										'metaboxes'           => [ 'learndash_course_groups' ],
+										'showDocumentSidebar' => 'false',
+									),
+								)
+							);
+						}
+					}
 
 				} elseif ( learndash_get_post_type_slug( 'quiz' ) === $screen_post_type ) {
 
@@ -1712,6 +1767,35 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 								'link'       => add_query_arg( 'quiz_id', $post->ID, admin_url( 'admin.php?page=learndash_data_upgrades' ) ),
 								'isExternal' => 'true',
 							),
+						)
+					);
+
+					if ( current_user_can('wpProQuiz_export') ) {
+						$action_menu = array_merge(
+							$action_menu,
+							array(
+								array(
+									'title'      => sprintf(
+										// translators: placeholder: Quiz.
+										esc_html_x( 'Export %s', 'placeholder: Quiz', 'learndash' ),
+										LearnDash_Custom_Label::get_label( 'quiz' )
+									),
+									'link'       => add_query_arg(
+										array(
+											'page'       => 'ldAdvQuiz',
+											'quiz_id'    => $post->ID,
+										),
+										admin_url( 'admin.php' )
+									),
+									'isExternal' => 'true',
+								)
+							)
+						);
+					}
+
+					$action_menu = array_merge(
+						$action_menu,
+						array(
 							array(
 								'title'      => esc_html__( 'Statistics', 'learndash' ),
 								'link'       => add_query_arg(
@@ -1746,13 +1830,15 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 					),
 					true
 				) ) {
+					$post_settings_metaboxes = array();
 
-					$post_settings_metaboxes = [ $screen_post_type ];
 					switch ( $screen_post_type ) {
 						case learndash_get_post_type_slug( 'lesson' ):
+
 							$post_settings_metaboxes = array_merge(
 								$post_settings_metaboxes,
 								[
+									$screen_post_type,
 									'learndash-lesson-display-content-settings',
 									'learndash-lesson-access-settings',
 									'learndash-course-grid-meta-box',
@@ -1764,24 +1850,40 @@ if ( ! class_exists( 'Learndash_Admin_Menus_Tabs' ) ) {
 							$post_settings_metaboxes = array_merge(
 								$post_settings_metaboxes,
 								[
+									$screen_post_type,
 									'learndash-topic-display-content-settings',
 									'learndash-topic-access-settings',
 									'learndash-course-grid-meta-box',
 								]
 							);
 							break;
+
+						case learndash_get_post_type_slug( 'question' ):
+							if ( LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Quizzes_Builder', 'shared_questions' ) !== 'yes' ) {
+								$post_settings_metaboxes = array_merge(
+									$post_settings_metaboxes,
+									[
+										$screen_post_type,
+									]
+								);
+							}
+							break;
+
 					}
-					$header_data['tabs'] = array_merge(
-						$header_data['tabs'],
-						array(
+
+					if ( ! empty( $post_settings_metaboxes ) ) {
+						$header_data['tabs'] = array_merge(
+							$header_data['tabs'],
 							array(
-								'id'                  => $screen_post_type . '-settings',
-								'name'                => esc_html__( 'Settings', 'learndash' ),
-								'metaboxes'           => $post_settings_metaboxes,
-								'showDocumentSidebar' => 'false',
-							),
-						)
-					);
+								array(
+									'id'                  => $screen_post_type . '-settings',
+									'name'                => esc_html__( 'Settings', 'learndash' ),
+									'metaboxes'           => $post_settings_metaboxes,
+									'showDocumentSidebar' => 'false',
+								),
+							)
+						);
+					}
 				}
 			}
 

@@ -84,12 +84,12 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 					$this->transition_deprecated_settings();
 				}
 
-				//if ( true === is_data_upgrade_quiz_questions_updated() ) {
-				//	$this->setting_option_values['quiz_builder_enabled'] = 'yes';
-				//} else {
-				//	$this->setting_option_values['quiz_builder_enabled'] = '';
-				//	$this->setting_option_values['quiz_builder_shared_questions'] = '';
-				//}
+				if ( true === is_data_upgrade_quiz_questions_updated() ) {
+					$this->setting_option_values['quiz_builder_enabled'] = 'yes';
+				} else {
+					$this->setting_option_values['quiz_builder_enabled'] = '';
+					$this->setting_option_values['quiz_builder_shared_questions'] = '';
+				}
 			}
 
 			if ( ! isset( $this->setting_option_values['quiz_builder_enabled'] ) ) {
@@ -393,6 +393,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 						$this->setting_option_values['quiz_templates'][ $template_id ] = esc_html( $template_name );
 					}
 				}
+				sort( $this->setting_option_values['quiz_templates'] );
 			}
 
 			$this->setting_option_fields['quiz_template'] = array(

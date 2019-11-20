@@ -94,6 +94,7 @@ if ( ( class_exists( 'LearnDash_Settings_Fields' ) ) && ( ! class_exists( 'Learn
 
 			if ( ( isset( $_GET['post'] ) ) && ( ! empty( $_GET['post'] ) ) && ( isset( $_GET['templateLoadId'] ) ) && ( ! empty( $_GET['templateLoadId'] ) ) ) {
 				$template_url = remove_query_arg( 'templateLoadId' );
+				$template_url = add_query_arg( 'currentTab', learndash_get_post_type_slug( 'quiz' ) .'-settings', $template_url );				
 				$html        .= '<option value="' . $template_url . '">' . sprintf(
 					// translators: Quiz Title.
 					esc_html_x( 'Revert: %s', 'placeholder: Quiz Title', 'learndash' ),

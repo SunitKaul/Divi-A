@@ -86,7 +86,9 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Quizzes' ) ) {
 			
 			$_DOING_INIT = false;
 			
-			require_once( LEARNDASH_LMS_PLUGIN_DIR . 'includes/vendor/parsecsv.lib.php' );
+			//require_once( LEARNDASH_LMS_PLUGIN_DIR . 'includes/vendor/parsecsv.lib.php' );
+			require_once( LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php' );
+
 			$this->csv_parse = new lmsParseCSV();
 			
 			if ( ( isset( $data['nonce'] ) ) && ( !empty( $data['nonce'] ) ) ) {
@@ -136,14 +138,12 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Quizzes' ) ) {
 						$reports_fp = fopen( $this->report_filename, 'w' );
 						fclose($reports_fp);
 											
-						//set_transient( $this->transient_key, $this->transient_data, MINUTE_IN_SECONDS );
-						$this->set_transient( $this->transient_key, $this->transient_data );
-						
+						$this->set_option_cache( $this->transient_key, $this->transient_data );
 
 						$this->send_report_headers_to_csv();
 						
 					} else {
-						//$this->transient_data = learndash_get_valid_transient( $this->transient_key );
+						//$this->transient_data = LDLMS_Transients::get( $this->transient_key );
 						$this->transient_data = $this->get_transient( $this->transient_key );
 						
 						//$this->report_filename = ABSPATH . $this->transient_data['report_filename'];
@@ -169,7 +169,7 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Quizzes' ) ) {
 							foreach( $this->transient_data['users_ids'] as $user_id_idx => $user_id ) {
 						
 								unset( $this->transient_data['users_ids'][$user_id_idx] );
-								$this->set_transient( $this->transient_key, $this->transient_data );
+								$this->set_option_cache( $this->transient_key, $this->transient_data );
 							
 								$report_user = get_user_by('id', $user_id);
 								if ( $report_user !== false ) {

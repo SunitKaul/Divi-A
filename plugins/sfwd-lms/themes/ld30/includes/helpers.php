@@ -809,22 +809,29 @@ function learndash_status_bubble( $status = 'incomplete', $context = null, $echo
 	$bubble = '';
 
 	switch ( $status ) {
-		case ( 'In Progress' ):
-		case ( 'progress' ):
-		case ( 'incomplete' ):
+		case 'In Progress':
+		case 'progress':
+		case 'incomplete':
 			$bubble = '<div class="ld-status ld-status-progress ld-primary-background">' . esc_html_x( 'In Progress', 'In Progress item status', 'learndash' ) . '</div>';
 			break;
-		case ( 'complete' ):
-		case ( 'completed' ):
-		case ( 'Completed' ):
+		
+			case 'complete':
+		case 'completed':
+		case 'Completed':
 			$bubble = '<div class="ld-status ld-status-complete ld-secondary-background">' . esc_html_x( 'Complete', 'In Progress item status', 'learndash' ) . '</div>';
 			break;
-		case ( 'graded' ):
+		
+			case 'graded':
 			$bubble = '<div class="ld-status ld-status-complete ld-secondary-background">' . esc_html_x( 'Graded', 'In Progress item status', 'learndash' ) . '</div>';
 			break;
-		case ( 'not_graded' ):
+		
+			case 'not_graded':
 			$bubble = '<div class="ld-status ld-status-progress ld-primary-background">' . esc_html_x( 'Not Graded', 'In Progress item status', 'learndash' ) . '</div>';
 			break;
+		
+			case '':
+		default:
+			break;	
 	}
 
 	$bubble = apply_filters( 'learndash_status_bubble', $bubble, $status );
@@ -1011,7 +1018,7 @@ function learndash_30_template_filename( $filepath = '', $name = '', $args = arr
 		'learndash_course_lesson_not_available.php'   => 'modules/messages/lesson-not-available.php',
 
 		// LD Core Modules.
-		'learndash_lesson_video'                      => 'modules/lesson-video.php',
+		'learndash_lesson_video.php'                  => 'modules/lesson-video.php',
 
 		'learndash_lesson_assignment_upload_form.php' => false,
 
@@ -1124,11 +1131,11 @@ function learndash_30_template_assets() {
 	/**
 	 * @TODO : These assets really should be moved to the /templates directory since they are part of the theme.
 	 */
-	wp_register_style( 'learndash-front', $theme_template_url . '/assets/css/learndash' . leardash_min_asset() . '.css', [], LD_30_VER );
+	wp_register_style( 'learndash-front', $theme_template_url . '/assets/css/learndash' . leardash_min_asset() . '.css', [], LEARNDASH_SCRIPT_VERSION_TOKEN );
 	//wp_register_script( 'learndash-front-script', $theme_template_url . '/assets/js/learndash' . leardash_min_asset() . '.js', array( 'jquery' ), LD_30_VER, true );
-	wp_register_script( 'learndash-front', $theme_template_url . '/assets/js/learndash.js', array( 'jquery' ), LD_30_VER, true );
+	wp_register_script( 'learndash-front', $theme_template_url . '/assets/js/learndash.js', array( 'jquery' ), LEARNDASH_SCRIPT_VERSION_TOKEN, true );
 
-	wp_register_style( 'learndash-quiz-front', $theme_template_url . '/assets/css/learndash.quiz.front' . leardash_min_asset() . '.css', [], LD_30_VER );
+	wp_register_style( 'learndash-quiz-front', $theme_template_url . '/assets/css/learndash.quiz.front' . leardash_min_asset() . '.css', [], LEARNDASH_SCRIPT_VERSION_TOKEN );
 
 	wp_enqueue_style( 'learndash-front' );
 	wp_style_add_data( 'learndash-front', 'rtl', 'replace' );
@@ -1163,9 +1170,9 @@ function learndash_30_template_assets() {
 add_action( 'enqueue_block_editor_assets', 'learndash_30_editor_scripts' );
 function learndash_30_editor_scripts() {
 
-	wp_enqueue_style( 'learndash-front', LEARNDASH_LMS_PLUGIN_URL . 'themes/ld30/assets/css/learndash' . leardash_min_asset() . '.css', [], LD_30_VER );
+	wp_enqueue_style( 'learndash-front', LEARNDASH_LMS_PLUGIN_URL . 'themes/ld30/assets/css/learndash' . leardash_min_asset() . '.css', [], LEARNDASH_SCRIPT_VERSION_TOKEN );
 	wp_style_add_data( 'learndash-front', 'rtl', 'replace' );
-	wp_enqueue_script( 'learndash-front', LEARNDASH_LMS_PLUGIN_URL . 'themes/ld30/assets/js/learndash' . leardash_min_asset() . '.js', array( 'jquery' ), LD_30_VER, true );
+	wp_enqueue_script( 'learndash-front', LEARNDASH_LMS_PLUGIN_URL . 'themes/ld30/assets/js/learndash' . leardash_min_asset() . '.js', array( 'jquery' ), LEARNDASH_SCRIPT_VERSION_TOKEN, true );
 
 }
 
@@ -1665,13 +1672,12 @@ function learndash_manage_comments() {
 	global $post;
 	if ( ( $post ) && ( is_a( $post, 'WP_Post' ) ) && ( in_array( $post->post_type, array( 'sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'sfwd-quiz' ) ) ) ) {
 		if ( 'yes' === LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'focus_mode_enabled' ) ) {
-
-			$focus_mode_comments = apply_filters( 'learndash_focus_mode_comments', 'closed', $post );
+			$focus_mode_comments = apply_filters( 'learndash_focus_mode_comments', $post->comment_status, $post );
 			if ( 'closed' === $focus_mode_comments ) {
-				$post->comment_status = $focus_mode_comments;
 				add_filter( 'comments_array', 'learndash_remove_comments', 1, 2 );
 			} else {
 				remove_filter( 'comments_array', 'learndash_remove_comments' );
+				remove_filter( 'comments_open', 'learndash_comments_open');
 			}
 		}
 	}
@@ -1715,17 +1721,110 @@ function learndash_authenticate( $user, $username, $password ) {
 add_filter( 'authenticate', 'learndash_authenticate', 99, 3 );
 
 /**
+ * Hook into the wp_login action fired after the user authenticated. 
+ * If the form course is set then we can enroll the user into the course in one step.
+ * @since 3.1
+ */
+function learndash_wp_login_enroll( $user_login, $user ) {
+	if ( ( $user ) && ( is_a( $user, 'WP_User' ) ) ) {
+		if ( ( isset( $_POST['learndash-login-form-course'] ) ) && ( ! empty( $_POST['learndash-login-form-course'] ) ) ) {
+			$course_id = absint( $_POST['learndash-login-form-course'] );
+
+			if ( ( ! empty( $course_id ) ) && ( apply_filters( 'learndash_login_form_include_course', true, $course_id ) ) ) {
+				if ( ( isset( $_POST['learndash-login-form-course-nonce'] ) ) && ( wp_verify_nonce( $_POST['learndash-login-form-course-nonce'], 'learndash-login-form-course-' . $course_id . '-nonce' ) ) ) {
+					if ( ( learndash_get_post_type_slug( 'course' ) === get_post_type( $course_id ) ) ) {
+						ld_update_course_access( $user->ID, $course_id );
+					}	
+				}
+			}
+		}
+	}
+}
+add_action( 'wp_login', 'learndash_wp_login_enroll', 1, 2 );
+
+/*
+function learndash_wp_new_user_notification_email( $email = array(), $user, $blogname ) {
+	if ( ( isset( $email['message'] ) ) && ( ! empty( $email['message'] ) ) && ( $user ) && ( is_a( $user, 'WP_User' ) ) ) {
+		if ( ( isset( $_POST['learndash-registration-form-course'] ) ) && ( ! empty( $_POST['learndash-registration-form-course'] ) ) ) {
+			$course_id = absint( $_POST['learndash-registration-form-course'] );
+
+			if ( ( ! empty( $course_id ) ) && ( apply_filters( 'learndash_registration_form_include_course', true, $course_id ) ) ) {
+				if ( ( isset( $_POST['learndash-registration-form-course-nonce'] ) ) && ( wp_verify_nonce( $_POST['learndash-registration-form-course-nonce'], 'learndash-registration-form-course-' . $course_id . '-nonce' ) ) ) {
+					if ( ( learndash_get_post_type_slug( 'course') === get_post_type( $course_id ) ) ) {
+
+						$reg_expr = '/<(.*?)>\r\n\r\n/si';
+						$found_count = preg_match_all( $reg_expr, $email['message'], $m );
+						if ( ( $found_count ) && ( isset( $m[1] ) ) && ( ! empty( $m[1] ) ) ) {
+							$pw_url = $m[1][0];
+							$pw_url = add_query_arg(
+								array(
+									'learndash-registration-form-course' => absint( $_POST['learndash-registration-form-course'] ),
+									'learndash-registration-form-course-nonce' => $_POST['learndash-registration-form-course-nonce']
+								),
+								$pw_url
+							);
+
+							$email['message'] = str_replace( $m[1][0], $pw_url, $email['message'] );
+
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return $email;
+
+}
+//add_filter( 'wp_new_user_notification_email', 'learndash_wp_new_user_notification_email', 50, 3 );
+*/
+
+function learndash_login_headerurl() {
+
+    // Check if have submitted
+    $confirm = ( isset($_GET['action'] ) && $_GET['action'] == 'resetpass' );
+
+    if( $confirm ) {
+		global $user;
+		if ( ( $user ) && ( is_a( $user, 'WP_User' ) ) ) {
+			$registered_course_id = get_user_meta( $user->ID, '_ld_registered_course', true );
+			//delete_user_meta( $user->ID, '_ld_registered_course', $registered_course_id );
+			$registered_course_id = absint( $registered_course_id );
+			if ( ! empty( $registered_course_id ) ) {
+				ld_update_course_access( $user->ID, $registered_course_id );
+			}
+			$registered_course_url = get_permalink( $registered_course_id );
+			$registered_course_url .= '#login';
+			wp_redirect( $registered_course_url );
+        	exit;
+		}
+
+        wp_redirect( home_url() );
+        exit;
+    }
+}
+add_action('login_headerurl', 'learndash_login_headerurl');
+
+
+/**
  * Add our hidden form field to the login form.
  *
  * @since 3.0
  * @param sting $content Login form content.
  */
-function learndash_add_login_field_top( $content ) {
-	return $content .= '<input id="learndash-login-form" type="hidden" name="learndash-login-form" value="' . wp_create_nonce( 'learndash-login-form' ) . '" />';
+function learndash_add_login_field_top( $content = '' ) {
+	$content .= '<input id="learndash-login-form" type="hidden" name="learndash-login-form" value="' . wp_create_nonce( 'learndash-login-form' ) . '" />';
+
+	$course_id = learndash_get_course_id( get_the_ID() );
+	if ( ( ! empty( $course_id ) ) && ( apply_filters( 'learndash_login_form_include_course', true, $course_id ) ) ) {
+		$content .= '<input name="learndash-login-form-course" value="'. $course_id .'" type="hidden" />';
+		
+		$content .= wp_nonce_field( 'learndash-login-form-course-' . $course_id . '-nonce', 'learndash-login-form-course-nonce', false, false );
+	}
+
+	return $content;
 }
 
-
-add_action( 'register_post', 'learndash_register_fail_redirect', 99, 3 );
 function learndash_register_fail_redirect( $sanitized_user_login, $user_email, $errors ) {
 
 	if ( ! isset( $_POST['learndash-registration-form'] ) || ! isset( $_POST['learndash-registration-form-redirect'] ) ) {
@@ -1747,43 +1846,26 @@ function learndash_register_fail_redirect( $sanitized_user_login, $user_email, $
 		wp_redirect( $redirect_url . '#login' );
 		exit;
 	}
-
 }
+add_action( 'register_post', 'learndash_register_fail_redirect', 99, 3 );
 
-function learndash_focus_mode_comments( $comment, $args, $depth ) {
+function learndash_register_user( $user_id = 0 ) {
+	if ( ! empty( $user_id ) ) {
+		if ( ( isset( $_POST['learndash-registration-form-course'] ) ) && ( ! empty( $_POST['learndash-registration-form-course'] ) ) ) {
+			$course_id = absint( $_POST['learndash-registration-form-course'] );
 
-	$GLOBALS['comment'] = $comment;
-	?>
-
-	<div <?php comment_class( 'ld-focus-comment' ); ?> id="li-comment-<?php comment_ID(); ?>">
-
-		<?php if ( $comment->comment_approved == '0' ) : ?>
-			<span class="ld-comment-alert"><?php esc_html_e( 'Your response is awaiting for approval.', 'learndash' ); ?></span>
-		<?php endif; ?>
-
-		<div class="ld-comment-body">
-			<?php comment_text(); ?>
-		</div>
-
-		<div class="ld-comment-avatar">
-			<?php echo wp_kses_post( get_avatar( $comment->comment_author_email ) ); ?>
-			<span class="ld-comment-avatar-author">
-				<span class="ld-comment-author-name"><?php echo esc_html( $comment->comment_author ); ?></span>
-				<a class="ld-comment-permalink" href="<?php esc_url( get_comment_link( $comment->comment_ID ) ); ?>">
-				<?php
-				printf(
-					// translators: placeholders: %1$s: Comment Date, %2$s: Comment Time
-					esc_html_x( 'on %1$s at %2$s', 'placeholders: comment date, comment time', 'learndash' ),
-					get_comment_date(),
-					get_comment_time()
-				);
-				?>
-				</a>
-			</span>
-		</div>
-
-	<?php
+			if ( ( ! empty( $course_id ) ) && ( apply_filters( 'learndash_registration_form_include_course', true, $course_id ) ) ) {
+				if ( ( isset( $_POST['learndash-registration-form-course-nonce'] ) ) && ( wp_verify_nonce( $_POST['learndash-registration-form-course-nonce'], 'learndash-registration-form-course-' . $course_id . '-nonce' ) ) ) {
+					if ( ( learndash_get_post_type_slug( 'course') === get_post_type( $course_id ) ) ) {
+						//ld_update_course_access( $user_id, $course_id );
+						add_user_meta( $user_id, '_ld_registered_course', absint( $course_id ) );
+					}	
+				}
+			}
+		}
+	}
 }
+add_action( 'user_register', 'learndash_register_user', 10, 1 );
 
 add_action( 'init', 'learndash_30_nav_menus' );
 function learndash_30_nav_menus() {
@@ -1834,7 +1916,7 @@ function learndash_30_custom_colors() {
 	$focus_width = apply_filters( 'learndash_30_focus_mode_width', LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'focus_mode_content_width' ) );
 
 	ob_start();
-
+/*
 	if ( isset( $responsive_video ) && $responsive_video === 'yes' ) {
 		?>
 		.ld-resp-video {
@@ -1865,9 +1947,14 @@ function learndash_30_custom_colors() {
 		}
 		<?php
 	}
-	if ( isset( $colors['primary'] ) && ! empty( $colors['primary'] ) ) {
-		?>
+*/
+	if ( ( isset( $colors['primary'] ) ) && ( ! empty( $colors['primary'] ) ) && ( LD_30_COLOR_PRIMARY != $colors['primary'] ) ) {
 
+		// Convert HEX to RGB for for use with rgba()
+		$primaryBuildRgb = list($r, $g, $b) = sscanf($colors['primary'], "#%02x%02x%02x");
+		$primaryRgb = "$r, $g, $b";
+
+		?>
 		.learndash-wrapper .ld-item-list .ld-item-list-item.ld-is-next,
 		.learndash-wrapper .wpProQuiz_content .wpProQuiz_questionListItem label:focus-within {
 			border-color: <?php echo $colors['primary']; ?>;
@@ -1890,8 +1977,19 @@ function learndash_30_custom_colors() {
 		.learndash-wrapper .ld-icon-certificate,
 		.learndash-wrapper .ld-login-modal .ld-login-modal-login .ld-modal-heading,
 		#wpProQuiz_user_content a,
-		.learndash-wrapper .ld-item-list .ld-item-list-item a.ld-item-name:hover {
+		.learndash-wrapper .ld-item-list .ld-item-list-item a.ld-item-name:hover,
+		.learndash-wrapper .ld-focus-comments__heading-actions .ld-expand-button,
+		.learndash-wrapper .ld-focus-comments__heading a,
+		.learndash-wrapper .ld-focus-comments .comment-respond a,
+		.learndash-wrapper .ld-focus-comment .ld-comment-reply a.comment-reply-link:hover,
+		.learndash-wrapper .ld-expand-button.ld-button-alternate {
 			color: <?php echo $colors['primary']; ?> !important;
+		}
+
+		.learndash-wrapper .ld-focus-comment.bypostauthor>.ld-comment-wrapper, 
+		.learndash-wrapper .ld-focus-comment.role-group_leader>.ld-comment-wrapper, 
+		.learndash-wrapper .ld-focus-comment.role-administrator>.ld-comment-wrapper {
+			background-color:rgba(<?php echo $primaryRgb; ?>, 0.03) !important;
 		}
 
 
@@ -1900,16 +1998,21 @@ function learndash_30_custom_colors() {
 			background: <?php echo $colors['primary']; ?> !important;
 		}
 
-		.learndash-wrapper .ld-course-navigation .ld-lesson-item.ld-is-current-lesson .ld-status-incomplete {
+
+
+		.learndash-wrapper .ld-course-navigation .ld-lesson-item.ld-is-current-lesson .ld-status-incomplete,
+		.learndash-wrapper .ld-focus-comment.bypostauthor:not(.ptype-sfwd-assignment) >.ld-comment-wrapper>.ld-comment-avatar img, 
+		.learndash-wrapper .ld-focus-comment.role-group_leader>.ld-comment-wrapper>.ld-comment-avatar img, 
+		.learndash-wrapper .ld-focus-comment.role-administrator>.ld-comment-wrapper>.ld-comment-avatar img {
 			border-color: <?php echo $colors['primary']; ?> !important;
 		}
+
 
 
 		.learndash-wrapper .ld-loading::before {
 			border-top:3px solid <?php echo $colors['primary']; ?> !important;
 		}
 
-		.learndash-wrapper .wpProQuiz_reviewDiv .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionTarget,
 		.learndash-wrapper .ld-button:hover:not(.learndash-link-previous-incomplete):not(.ld-button-transparent),
 		#learndash-tooltips .ld-tooltip:after,
 		#learndash-tooltips .ld-tooltip,
@@ -1918,9 +2021,8 @@ function learndash_30_custom_colors() {
 		.learndash-wrapper #btn-join,
 		.learndash-wrapper .ld-button:not(.ld-js-register-account):not(.learndash-link-previous-incomplete):not(.ld-button-transparent),
 		.learndash-wrapper .ld-expand-button,
-		.learndash-wrapper .wpProQuiz_content .wpProQuiz_button,
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_button:not(.wpProQuiz_button_reShowQuestion):not(.wpProQuiz_button_restartQuiz),
 		.learndash-wrapper .wpProQuiz_content .wpProQuiz_button2,
-		.learndash-wrapper .wpProQuiz_content a#quiz_continue_link,
 		.learndash-wrapper .ld-focus .ld-focus-sidebar .ld-course-navigation-heading,
 		.learndash-wrapper .ld-focus .ld-focus-sidebar .ld-focus-sidebar-trigger,
 		.learndash-wrapper .ld-focus-comments .form-submit #submit,
@@ -1964,11 +2066,27 @@ function learndash_30_custom_colors() {
 			color: <?php echo $colors['primary']; ?> !important;
 		}
 
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_addToplist {
+			background-color: <?php echo learndash_hex2rgb( $colors['primary'], '0.1' ); ?> !important;
+			border: 1px solid <?php echo $colors['primary']; ?> !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_toplistTable th {
+			background: <?php echo $colors['primary']; ?> !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_toplistTrOdd {
+			background-color: <?php echo learndash_hex2rgb( $colors['primary'], '0.1' ); ?> !important;
+		}
+		
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_reviewDiv li.wpProQuiz_reviewQuestionTarget {
+			background-color: <?php echo $colors['primary']; ?> !important;
+		}
 
 		<?php
 	}
 
-	if ( isset( $colors['secondary'] ) && ! empty( $colors['secondary'] ) ) {
+	if ( ( isset( $colors['secondary'] ) ) && ( ! empty( $colors['secondary'] ) ) && ( LD_30_COLOR_SECONDARY != $colors['secondary'] ) ) {
 		?>
 
 		.learndash-wrapper #quiz_continue_link,
@@ -1979,6 +2097,19 @@ function learndash_30_custom_colors() {
 		.learndash-wrapper .ld-alert-success .ld-button,
 		.learndash-wrapper .ld-alert-success .ld-alert-icon {
 			background-color: <?php echo $colors['secondary']; ?> !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content a#quiz_continue_link {
+			background-color: <?php echo $colors['secondary']; ?> !important;
+		}
+
+		.learndash-wrapper .course_progress .sending_progress_bar {
+			background: <?php echo $colors['secondary']; ?> !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_button_reShowQuestion:hover, .learndash-wrapper .wpProQuiz_content .wpProQuiz_button_restartQuiz:hover {
+			background-color: <?php echo $colors['secondary']; ?> !important;
+			opacity: 0.75;
 		}
 
 		.learndash-wrapper .ld-secondary-color-hover:hover,
@@ -1995,14 +2126,23 @@ function learndash_30_custom_colors() {
 		}
 
 		.learndash-wrapper .ld-alert-success {
-			border-color: <?php echo $colors['secondary']; ?> !important;
+			border-color: <?php echo $colors['secondary']; ?>;
 			background-color: transparent !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionSolved,
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_box li.wpProQuiz_reviewQuestionSolved {
+			background-color: <?php echo $colors['secondary']; ?> !important;
+		}
+		
+		.learndash-wrapper .wpProQuiz_content  .wpProQuiz_reviewLegend span.wpProQuiz_reviewColor_Answer {
+			background-color: <?php echo $colors['secondary']; ?> !important;
 		}
 
 		<?php
 	}
 
-	if ( isset( $colors['tertiary'] ) && ! empty( $colors['tertiary'] ) ) {
+	if ( ( isset( $colors['tertiary'] ) ) && ( ! empty( $colors['tertiary'] ) ) && ( LD_30_COLOR_TERTIARY != $colors['tertiary'] ) ) {
 		?>
 
 		.learndash-wrapper .ld-alert-warning {
@@ -2031,6 +2171,15 @@ function learndash_30_custom_colors() {
 		.learndash-wrapper .ld-tertiary-background,
 		.learndash-wrapper .ld-alert-warning .ld-alert-icon {
 			color:white !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_reviewQuestion li.wpProQuiz_reviewQuestionReview,
+		.learndash-wrapper .wpProQuiz_content .wpProQuiz_box li.wpProQuiz_reviewQuestionReview {
+			background-color: <?php echo $colors['tertiary']; ?> !important;
+		}
+
+		.learndash-wrapper .wpProQuiz_content  .wpProQuiz_reviewLegend span.wpProQuiz_reviewColor_Review {
+			background-color: <?php echo $colors['tertiary']; ?> !important;
 		}
 
 		<?php

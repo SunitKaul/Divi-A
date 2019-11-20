@@ -64,6 +64,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 		 * @param array $settings_values Array of settings fields.
 		 */
 		public function save_fields_to_post( $pro_quiz_edit, $settings_values = array() ) {
+			$_POST['quizRunOnce']       = $settings_values['quizRunOnce'];
 			$_POST['quizRunOnceType']   = $settings_values['quizRunOnceType'];
 			$_POST['quizRunOnceCookie'] = $settings_values['quizRunOnceCookie'];
 
@@ -78,7 +79,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 			parent::load_settings_values();
 
 			$this->quiz_edit = $this->init_quiz_edit( $this->_post );
-
+			
 			if ( true === $this->settings_values_loaded ) {
 
 				if ( ( isset( $this->setting_option_values['passingpercentage'] ) ) && ( '' !== $this->setting_option_values['passingpercentage'] ) ) {
@@ -124,6 +125,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 					} else {
 						$this->setting_option_values['retry_restrictions'] = '';
 						$this->setting_option_values['repeats']            = '0';
+						$this->setting_option_values['quizRunOnce']        = false;
 						$this->setting_option_values['quizRunOnceType']    = '';
 						$this->setting_option_values['quizRunOnceCookie']  = '';
 					}
@@ -165,7 +167,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 			} else {
 				$select_cert_options = $select_cert_options_default;
 			}
-
+/*
 			if ( ( defined( 'LEARNDASH_SELECT2_LIB' ) ) && ( true === apply_filters( 'learndash_select2_lib', LEARNDASH_SELECT2_LIB ) ) ) {
 				$select_quiz_options_default = array(
 					'' => sprintf(
@@ -189,7 +191,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 			} else {
 				$select_quiz_options = $select_quiz_options_default;
 			}
-
+*/
 			/*
 			$this->setting_option_fields = array(
                 'quizRunOnceType' => array(
@@ -454,9 +456,11 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 				if ( ( 'on' !== $settings_values['retry_restrictions'] ) || ( '' === $settings_values['repeats'] ) ) {
 					$settings_values['repeats']            = '';
 					$settings_values['retry_restrictions'] = '';
+					$settings_values['quizRunOnce']        = false;
 					$settings_values['quizRunOnceType']    = '';
 					$settings_values['quizRunOnceCookie']  = '';
 				} else {
+					$settings_values['quizRunOnce']        = true;
 					if ( ( isset( $settings_values['quizRunOnceCookie'] ) ) && ( 'on' === $settings_values['quizRunOnceCookie'] ) ) {
 						$settings_values['quizRunOnceCookie'] = true;
 					}

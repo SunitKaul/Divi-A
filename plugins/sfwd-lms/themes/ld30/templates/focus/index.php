@@ -48,31 +48,17 @@ if( have_posts() ): while( have_posts() ): the_post();
                 <?php do_action('learndash-focus-content-content-after', $course_id, $user_id ); ?>
 
                 <?php
-                if( is_user_logged_in() && comments_open() ): ?>
-                    <div class="ld-focus-comments">
-                        <?php
-                        do_action('learndash-focus-content-comments-before', $course_id, $user_id );
-
-                        $args = apply_filters( 'learndash_focus_mode_list_comments_args', array(
-                            'style' =>  'div',
-                            'page'  =>  get_the_ID(),
-                            'callback' => 'learndash_focus_mode_comments'
-                        ) );
-                        wp_list_comments($args);
-
-                        do_action('learndash-focus-content-comments-after', $course_id, $user_id );
-
-                        $args = apply_filters( 'learndash_focus_mode_comment_form_args', array(
-                            'title_reply' => __( 'Leave a Comment', 'learndash' ),
-                        ) );
-
-                        comment_form($args);
-
-                        do_action('learndash-focus-content-comment-form-after', $course_id, $user_id );
-                        ?>
-                    </div> <!--/ld-focus-comments-->
-                <?php
-                endif; ?>
+                if ( is_user_logged_in() && comments_open() ): 
+                
+                    learndash_get_template_part('focus/comments.php', array(
+                        'course_id' => $course_id,
+                        'user_id'   => $user_id,
+                        'context'   => 'focus'
+                    ), true);
+                
+                endif; 
+                
+                ?>
 
                 <?php do_action('learndash-focus-content-comments-after', $course_id, $user_id ); ?>
 

@@ -435,12 +435,14 @@ span.learndash-description {
 }
 
 .sfwd_options .learndash-section-field-number.-medium,
-.sfwd_options .learndash-section-field-text.-medium {
+.sfwd_options .learndash-section-field-text.-medium,
+.sfwd_options .learndash-section-field-url.-medium {
   width: 50%;
 }
 
 .sfwd_options .learndash-section-field-number.-small,
-.sfwd_options .learndash-section-field-text.-small {
+.sfwd_options .learndash-section-field-text.-small,
+.sfwd_options .learndash-section-field-url.-small {
   width: 100px;
 }
 
@@ -451,12 +453,14 @@ span.learndash-description {
 }
 
 .sfwd_options .learndash-section-field-number:hover,
-.sfwd_options .learndash-section-field-text:hover {
+.sfwd_options .learndash-section-field-text:hover,
+.sfwd_options .learndash-section-field-url:hover {
   border-color: #999;
 }
 
 .sfwd_options .learndash-section-field-number.full-text,
-.sfwd_options .learndash-section-field-text.full-text {
+.sfwd_options .learndash-section-field-text.full-text,
+.sfwd_options .learndash-section-field-url.full-text {
   width: 100%;
 }
 
@@ -588,10 +592,10 @@ width: 100% !important;
   border-top-color: inherit;
 }
 
-.select2-container--default .select2-selection--multiple {
+.sfwd_options .select2-container--default .select2-selection--multiple {
     border: 0px solid #aaa !important; 
 }
-.select2-container .select2-search--inline .select2-search__field {
+.sfwd_options .select2-container .select2-search--inline .select2-search__field {
     padding-top: 5px !important;
     color: #444 !important;
 }
@@ -800,19 +804,19 @@ width: 100% !important;
  * Quiz Custom Fields style 
  */
 
- .form_table_wrapper {
+ .sfwd_options .form_table_wrapper {
    margin-top: 0px; 
    padding: 0px; 
    border: 0px solid #C2C2C2;
  }
 
- .form_table_wrapper table {
+.sfwd_options  .form_table_wrapper table {
   border-collapse: collapse;
 }
 
 /* Line item CSS */
 
-.form_table_wrapper #form_add {
+.sfwd_options .form_table_wrapper #form_add {
   background-color: transparent;
   background-image: url("data:image/svg+xml,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23007cba' d='M185.066 128c0 3.534-2.866 6-6.4 6H134v44.666c0 3.534-2.467 6.399-6 6.399-3.534 0-6-2.865-6-6.399V134H77.332c-3.535 0-6.4-2.466-6.4-6s2.866-6 6.4-6H122V77.331c0-3.534 2.466-6.4 6-6.4 3.533 0 6 2.866 6 6.4V122h44.666c3.534 0 6.4 2.466 6.4 6zM256 128C256 57.42 198.58 0 128 0S0 57.42 0 128s57.42 128 128 128 128-57.42 128-128zm-12.8 0c0 63.521-51.679 115.2-115.2 115.2-63.522 0-115.2-51.679-115.2-115.2C12.8 64.478 64.478 12.8 128 12.8c63.521 0 115.2 51.678 115.2 115.2z' fill-rule='nonzero'%3E%3C/path%3E%3C/svg%3E");
   background-position: center left 3px;
@@ -827,16 +831,16 @@ width: 100% !important;
   box-shadow: none;
 }
 
-.form_table_wrapper #form_add:hover {
+.sfwd_options .form_table_wrapper #form_add:hover {
   background-image: url("data:image/svg+xml,%3Csvg width='256' height='256' viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%2311a0d2' d='M185.066 128c0 3.534-2.866 6-6.4 6H134v44.666c0 3.534-2.467 6.399-6 6.399-3.534 0-6-2.865-6-6.399V134H77.332c-3.535 0-6.4-2.466-6.4-6s2.866-6 6.4-6H122V77.331c0-3.534 2.466-6.4 6-6.4 3.533 0 6 2.866 6 6.4V122h44.666c3.534 0 6.4 2.466 6.4 6zM256 128C256 57.42 198.58 0 128 0S0 57.42 0 128s57.42 128 128 128 128-57.42 128-128zm-12.8 0c0 63.521-51.679 115.2-115.2 115.2-63.522 0-115.2-51.679-115.2-115.2C12.8 64.478 64.478 12.8 128 12.8c63.521 0 115.2 51.678 115.2 115.2z' fill-rule='nonzero'%3E%3C/path%3E%3C/svg%3E");
   color: #11a0d2;
 }
 
-.form_table_wrapper .form_move {
+.sfwd_options .form_table_wrapper .form_move {
   text-decoration: none;
 }
 
-.form_table_wrapper .form_delete {
+.sfwd_options .form_table_wrapper .form_delete {
   background-color: transparent;
   background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' role='img' focusable='false' class='dashicon dashicons-dismiss' xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23a00' d='M10 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm5 11l-3-3 3-3-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3z'%3E%3C/path%3E%3C/svg%3E");
   background-position: center left 3px;
@@ -852,46 +856,46 @@ width: 100% !important;
   visibility: hidden;
 }
 
-.form_table_wrapper .form_delete:hover {
+.sfwd_options .form_table_wrapper .form_delete:hover {
   color: red;
 }
 
-.form_table_wrapper tbody.ui-sortable tr:hover .form_delete {
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr:hover .form_delete {
   opacity: 1;
   visibility: visible;
 }
 
-.form_table_wrapper thead tr th,
-.form_table_wrapper tbody.ui-sortable tr td {
+.sfwd_options .form_table_wrapper thead tr th,
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr td {
   padding: 10px 5px;
   transition: box-shadow .1s;
 }
 
-.form_table_wrapper tbody.ui-sortable tr:hover td {
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr:hover td {
   box-shadow: 0 1px 0 0 #11a0d2, 0 -1px 0 0 #11a0d2;
 }
 
-.form_table_wrapper tbody.ui-sortable tr:hover td:first-of-type {
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr:hover td:first-of-type {
   box-shadow: 0 1px 0 0 #11a0d2, 0 -1px 0 0 #11a0d2, -1px 0 0 0 #11a0d2;
 }
 
-.form_table_wrapper tbody.ui-sortable tr:hover td:last-of-type {
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr:hover td:last-of-type {
   box-shadow: 0 1px 0 0 #11a0d2, 0 -1px 0 0 #11a0d2, 1px 0 0 0 #11a0d2;
 }
 
-.form_table_wrapper tbody.ui-sortable tr td:first-of-type {
+.sfwd_options .form_table_wrapper tbody.ui-sortable tr td:first-of-type {
   text-align: center;
 }
 
-.form_table_wrapper .ld-select.-field select {
+.sfwd_options .form_table_wrapper .ld-select.-field select {
   padding: 0 10px;
 }
 
-.form_table_wrapper #form_table thead th {
+.sfwd_options .form_table_wrapper #form_table thead th {
   text-transform: uppercase;
 }
 
-.form_table_wrapper #form_add_wrapper {
+.sfwd_options .form_table_wrapper #form_add_wrapper {
   margin-top: 10px;
   margin-left: 10px;
 }
@@ -1130,4 +1134,12 @@ Quiz Edit Result Text lists
 
 #learndash-settings-fields-notice-errors ul.errors-list li {
   margin-left: 15px;
+}
+
+/**
+ * Added to bring back the visible indicator on checkbox in Builder sodebar elements
+ * See LEARNDASH-4114
+ */
+.ld__builder-sidebar-widget .components-checkbox-control__input[type="checkbox"]:checked::before {
+  content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%231e8cbe%27%2F%3E%3C%2Fsvg%3E");
 }

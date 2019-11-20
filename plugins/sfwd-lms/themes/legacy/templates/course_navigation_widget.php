@@ -54,7 +54,9 @@ if ( $widget_instance['show_widget_wrapper'] != false ) {
 <?php if ( apply_filters('learndash_course_steps_expand_all', false, $course_id, 'course_navigation_widget' ) ) { ?>
 	<script>
 		jQuery(document).ready(function() {
-			jQuery(".course_navigation .list_arrow").trigger('click');
+			setTimeout(function(){
+				jQuery(".course_navigation .list_arrow").trigger('click');
+			}, 1000);	
 		});
 	</script>	
 	<?php 

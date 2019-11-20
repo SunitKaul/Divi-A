@@ -34,7 +34,8 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 				// Section label/header.
 				$this->settings_section_label = esc_html__( 'Quick Links', 'learndash' );
 
-				$this->metabox_context = 'side';
+				$this->metabox_context  = 'side';
+				$this->metabox_priority = 'high';
 
 				parent::__construct();
 			}

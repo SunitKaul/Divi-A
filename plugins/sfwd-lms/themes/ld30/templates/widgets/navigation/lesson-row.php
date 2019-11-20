@@ -38,7 +38,7 @@ if ( isset($_GET['widget_instance']['widget_instance']['current_lesson_id']) ) {
 
 $is_current_lesson = ( $current_lesson_id == $lesson['post']->ID ? true : false );
 
-$lesson_class = 'ld-lesson-item ' . ( $is_current_lesson ? 'ld-is-current-lesson' : '' );
+$lesson_class = 'ld-lesson-item ' . ( $is_current_lesson ? 'ld-is-current-lesson' : 'ld-is-not-current-lesson' );
 $lesson_class .= ( !empty($lesson['lesson_access_from']) || !$has_access ? ' learndash-not-available' : '' );
 $lesson_class .= ' ' . ( $lesson['status'] == 'completed' ? 'learndash-complete' : 'learndash-incomplete' );
 $lesson_class .= ( isset($lesson['sample']) ? ' ' . $lesson['sample'] : '' );
@@ -79,13 +79,15 @@ endif; ?>
         if( $expandable ):
 
             /**
-             * Setup the necissary variables to expanding and content counts
+             * Filter to contol auto-expanding of lessons in Focus Mode sidebar.
+             * @since 3.0
              *
-             * @var [string] $expand_class
-             * @var [array]  $count_count
+             * @var string $expand_class Value will be 'ld-expanded' if current lesson or empty string.
+             * @var integer $lesson_id Lesson Post ID. @since 3.1
+             * @var integer $course_id Course Post ID. @since 3.1
+             * @var integer $user_id User ID. @since 3.1
              */
-
-            $expand_class  = apply_filters( 'learndash-nav-widget-expand-class', ( $is_current_lesson ? 'ld-expanded' : '' ) );
+            $expand_class  = apply_filters( 'learndash-nav-widget-expand-class', ( $is_current_lesson ? 'ld-expanded' : '' ), $lesson['post']->ID, $course_id, $user_id );
             $content_count = learndash_get_lesson_content_count( $lesson, $course_id ); ?>
 
             <span class="ld-expand-button ld-button-alternate <?php echo esc_attr($expand_class); ?>" aria-label="<?php esc_html_e( 'Expand Lesson', 'learndash' ); ?>" data-ld-expands="<?php echo esc_attr('ld-nav-content-list-' . $lesson['post']->ID ); ?>" data-ld-collapse-text="false">

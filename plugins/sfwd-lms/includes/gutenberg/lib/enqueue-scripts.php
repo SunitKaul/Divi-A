@@ -13,7 +13,8 @@ function learndash_editor_scripts() {
 		'ldlms-blocks-js',
 		plugins_url( $blockPath, __FILE__ ),
 		[ 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-components', 'wp-editor' ],
-		filemtime( plugin_dir_path(__FILE__) . $blockPath )
+		//filemtime( plugin_dir_path(__FILE__) . $blockPath )
+		LEARNDASH_SCRIPT_VERSION_TOKEN
 	);
 
 	/**
@@ -126,7 +127,8 @@ function learndash_editor_scripts() {
 		'ldlms-blocks-editor-css',
 		plugins_url( $editorStylePath, __FILE__ ),
 		[],
-		filemtime( plugin_dir_path( __FILE__ ) . $editorStylePath )
+		//filemtime( plugin_dir_path( __FILE__ ) . $editorStylePath )
+		LEARNDASH_SCRIPT_VERSION_TOKEN
 	);
 	wp_style_add_data( 'ldlms-blocks-editor-css', 'rtl', 'replace' );
 
@@ -163,7 +165,8 @@ function learndash_scripts() {
 			'ldlms-blocks-frontend',
 			plugins_url( $blockPath, __FILE__ ),
 			[],
-			filemtime( plugin_dir_path(__FILE__) . $blockPath )
+			//filemtime( plugin_dir_path(__FILE__) . $blockPath )
+			LEARNDASH_SCRIPT_VERSION_TOKEN
 		);
 	}
 
@@ -172,7 +175,8 @@ function learndash_scripts() {
 		'learndash-blocks',
 		plugins_url($stylePath, __FILE__),
 		[],
-		filemtime(plugin_dir_path(__FILE__) . $stylePath )
+		//filemtime(plugin_dir_path(__FILE__) . $stylePath )
+		LEARNDASH_SCRIPT_VERSION_TOKEN
 	);
 	wp_style_add_data( 'learndash-blocks', 'rtl', 'replace' );
 }

@@ -41,6 +41,14 @@ registerBlockType(
 		description: sprintf(_x('This block shows a list of %s.', 'placeholders: courses', 'learndash'), ldlms_get_custom_label('courses') ),
 		icon: 'list-view',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
         attributes: {
 			orderby: {
 				type: 'string',
@@ -121,9 +129,13 @@ registerBlockType(
 				type: 'boolean',
 				default: true
 			},
+			example_show: {
+				type: 'boolean',
+				default: 0
+			},
 		},
         edit: function( props ) {
-			const { attributes: { orderby, order, per_page, mycourses, show_content, show_thumbnail, course_category_name, course_cat, course_categoryselector, course_tag, course_tag_id, category_name, cat, categoryselector, tag, tag_id, course_grid, progress_bar, col, preview_user_id, preview_show },
+			const { attributes: { orderby, order, per_page, mycourses, show_content, show_thumbnail, course_category_name, course_cat, course_categoryselector, course_tag, course_tag_id, category_name, cat, categoryselector, tag, tag_id, course_grid, progress_bar, col, preview_user_id, preview_show, example_show },
             	setAttributes } = props;
 
 			let field_show_content = '';

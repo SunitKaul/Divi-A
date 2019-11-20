@@ -66,6 +66,15 @@ function learndash_load_resources() {
 		$learndash_assets_loaded['styles']['learndash_template_style_css'] = __FUNCTION__;
 	} 
 	
+	if ( true === apply_filters( 'learndash_responsive_video', true, get_post_type(), get_the_ID() ) ) {
+		$filepath = SFWD_LMS::get_template( 'learndash_lesson_video.css', null, null, true );
+		if ( !empty( $filepath ) ) {
+			wp_enqueue_style( 'learndash_lesson_video', learndash_template_url_from_path( $filepath ), array(), LEARNDASH_SCRIPT_VERSION_TOKEN );
+			//wp_style_add_data( 'learndash_video', 'rtl', 'replace' );
+			$learndash_assets_loaded['styles']['learndash_lesson_video'] = __FUNCTION__;
+		} 
+	}
+	
 	if ( !isset( $learndash_assets_loaded['scripts']['learndash_template_script_js'] ) ) {
 		// First check if the theme has the file learndash/learndash_template_script.js or learndash_template_script.js file
 		$filepath = SFWD_LMS::get_template( 'learndash_template_script.js', null, null, true );

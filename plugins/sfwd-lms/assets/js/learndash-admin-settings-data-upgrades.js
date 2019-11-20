@@ -1,5 +1,5 @@
 jQuery(document).ready(function(){
-	jQuery('table#learndash-data-upgrades button').click(function(e) {
+	jQuery('table#learndash-data-upgrades button.learndash-data-upgrades-button').click(function(e) {
 		e.preventDefault();
 
 		var parent_tr 	= jQuery(this).parents('tr')
@@ -20,13 +20,48 @@ jQuery(document).ready(function(){
 		}
 
 		var process_quiz = false;
-		if (jQuery('.learndash-data-upgrades-quiz input[name="learndash-data-upgrades-quiz"]', parent_tr).length) {
-			process_quiz = jQuery('.learndash-data-upgrades-quiz input[name="learndash-data-upgrades-quiz"]', parent_tr).val();
-			if (typeof process_quiz === 'undefined') {
-				process_quiz = false;
+		var proquiz_prefix = false;
+		//var proquiz_rename = false;
+		if (data_slug === 'rename-wpproquiz-tables') {
+			jQuery(e.currentTarget).hide();
+			jQuery('div#learndash-data-upgrades-rename-wpproquiz-tables-show-tables-list table', parent_tr).hide();
+			
+			jQuery('button.learndash-data-upgrades-button-'+data_slug+'-reload', parent_tr).show();
+			jQuery('button.learndash-data-upgrades-button-' + data_slug + '-reload', parent_tr).click( function(){
+				window.location.reload(true);
+				return false;
+			});
+			
+			if (jQuery('input[name="learndash-data-upgrades-quiz"]', parent_tr).length) {
+				process_quiz = jQuery('input[name="learndash-data-upgrades-quiz"]', parent_tr).val();
+				if (typeof process_quiz === 'undefined') {
+					process_quiz = false;
+				}
 			}
-		}
 		
+			if (jQuery('input[name="learndash-data-upgrades-prefix"]', parent_tr).length) {
+				var proquiz_prefix_selected = jQuery('input[name="learndash-data-upgrades-prefix"]:checked', parent_tr);
+				if ((typeof proquiz_prefix_selected !== 'undefined') && (proquiz_prefix_selected.length > 0 )) {
+					jQuery('input[name="learndash-data-upgrades-prefix"]', parent_tr).attr('disabled', true );
+					//var current_prefix = jQuery(proquiz_prefix_selected).data('current-prefix');
+					var current_prefix_selected = jQuery(proquiz_prefix_selected).val();
+					//if (current_prefix === current_prefix_selected ) {
+					//	return false;
+					//} else {
+						proquiz_prefix = current_prefix_selected;
+					//}
+				}
+			}
+			/*
+			if (jQuery('input[name="learndash-data-upgrades-rename"]', parent_tr).length) {
+				var rename = jQuery('input[name="learndash-data-upgrades-rename"]:checked', parent_tr);
+				if ((typeof rename !== 'undefined') && ( rename.length > 0 ) ) {
+					proquiz_rename = 1;
+				}
+			}
+			*/
+		}
+
 		// Hide the Continue option.
 		jQuery('.learndash-data-upgrades-continue', parent_tr).hide();	
 
@@ -44,13 +79,36 @@ jQuery(document).ready(function(){
 				'slug': data_slug,
 				'continue': continue_checked,
 				'mismatched': mismatched_checked,
-				'quiz': process_quiz
+				'quiz': process_quiz,
+				'proquiz_prefix': proquiz_prefix,
+				//'proquiz_rename': proquiz_rename
 			}
 		}
-
-		learndash_data_upgrades_do_ajax( post_data, parent_tr );
+		//console.log('post_data[%o]', post_data);
 		
+		learndash_data_upgrades_do_ajax( post_data, parent_tr );
 	});
+
+	if ( jQuery('table#learndash-data-upgrades tr#learndash-data-upgrades-container-rename-wpproquiz-tables').length) {
+		var parent_tr = jQuery('table#learndash-data-upgrades tr#learndash-data-upgrades-container-rename-wpproquiz-tables');
+		
+		// Show the tables listing details.
+		jQuery('a.learndash-data-upgrades-show-tables', parent_tr).click(function (e) {
+			e.preventDefault();
+			jQuery('div#learndash-data-upgrades-rename-wpproquiz-tables-show-tables-list', parent_tr).toggle('slow');
+		});	
+
+		// Show the related tables listing based on the prefix selected.
+		jQuery('input[name="learndash-data-upgrades-prefix"]', parent_tr).change(function (e) {
+			e.preventDefault();
+			var prefix = jQuery('input[name="learndash-data-upgrades-prefix"]:checked', parent_tr).val();
+			jQuery('div#learndash-data-upgrades-rename-wpproquiz-tables-show-tables-list table', parent_tr).hide();
+			if ((typeof prefix !== 'undefined') && (prefix != '')) {
+				jQuery('div#learndash-data-upgrades-rename-wpproquiz-tables-show-tables-list table#tables-list-'+prefix, parent_tr).show('slow');
+			}
+		});
+		jQuery('input[name="learndash-data-upgrades-prefix"]', parent_tr).change();
+	}
 });
 
 function learndash_data_upgrades_do_ajax( post_data, container ) {

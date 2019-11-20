@@ -51,7 +51,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 		 */
 		public function save_settings_values( $old_value = '', $value = '', $option = '' ) {
 			// When the Lesson Options are changed we also want to purge the transients. All of them.
-			learndash_purge_transients();
+			LDLMS_Transients::purge_all();
 		}
 
 		/**

@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="learndash-wrapper">
     <?php
 
-    $message = '<p>' . sprintf( esc_html_x(
+    $message = sprintf( esc_html_x(
 			'To take this %s you need at least %.01f total points. You currently have %.01f points.',
 			'placeholders: (1) will be Course. (2) course_access_points. (3) user_course_points ',
 			'learndash'
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		$content_type,
 		$course_access_points,
 		$user_course_points
-   ) . '</p>';
+   );
 
     learndash_get_template_part( 'modules/alert.php', array(
         'type'      =>  'warning',

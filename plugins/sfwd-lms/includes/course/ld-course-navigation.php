@@ -17,10 +17,12 @@
  * @param  boolean $url      return a url instead of HTML link
  * @return string            previous post link output
  */
-function learndash_previous_post_link( $prevlink='', $url = false ) {
-	global $post;
+function learndash_previous_post_link( $prevlink='', $url = false, $post = null ) {
+if ( empty( $post) ) {
+		global $post;
+	}
 
-	if ( ! is_singular() || empty( $post) ) {
+	if ( empty( $post) ) {
 		return $prevlink;
 	}
 
@@ -51,11 +53,12 @@ function learndash_previous_post_link( $prevlink='', $url = false ) {
 	}
 
 	if ( isset( $found_at) && ! empty( $posts[ $found_at -1] ) ) {
-		$permalink = get_permalink( $posts[ $found_at -1]->ID );
-
-		if ( $url ) {
-			return $permalink;
+		if ( 'id' === $url ) {
+			return $posts[ $found_at -1]->ID;
+		} else if ( $url ) {
+			return get_permalink( $posts[ $found_at -1]->ID );
 		} else {
+			$permalink = get_permalink( $posts[ $found_at + 1]->ID );
 			if ( is_rtl() ) {
 				$link_name_with_arrow = $link_name;
 			} else {
@@ -87,7 +90,8 @@ function learndash_previous_post_link( $prevlink='', $url = false ) {
  * @since 2.1.0
  * 
  * @param  string  $prevlink
- * @param  boolean $url      return a url instead of HTML link
+ * @param  boolean $url      return a url instead of HTML link.
+ *                           Added 3.1 'id' will return next step post ID.
  * @param  object  $post     WP_Post object
  * @return string            next post link output
  */
@@ -129,11 +133,12 @@ function learndash_next_post_link( $prevlink='', $url = false, $post = null ) {
 	}
 
 	if ( isset( $found_at) && ! empty( $posts[ $found_at + 1] ) ) {
-		$permalink = get_permalink( $posts[ $found_at + 1]->ID );
-		if ( $url ) {
-			return $permalink;
+		if ( 'id' === $url ) {
+			return $posts[ $found_at + 1]->ID;
+		} else if ( $url ) {
+			return get_permalink( $posts[ $found_at + 1]->ID );
 		} else {
-
+			$permalink = get_permalink( $posts[ $found_at + 1]->ID );
 			if ( is_rtl() ) {
 				$link_name_with_arrow = $link_name ;
 			} else {
@@ -151,6 +156,13 @@ function learndash_next_post_link( $prevlink='', $url = false, $post = null ) {
 			 */
 			return apply_filters( 'learndash_next_post_link', $link, $permalink, $link_name, $post );
 		}
+//	} else if ( $post->post_type == 'sfwd-topic' ) {
+//		if ( ( isset( $lesson_id ) ) && ( ! empty( $lesson_id ) ) ) {
+//			$lesson_post = get_post( $lesson_id );
+//			if ( ( is_a( $lesson_post, 'WP_Post' ) ) && ( $lesson_post->post_type === learndash_get_post_type_slug( 'lesson' ) ) ) {
+//				return learndash_next_post_link( $prevlink, $url, $lesson_post );
+//			}
+//		}
 	} else {
 		return $prevlink;
 	}
@@ -528,7 +540,7 @@ function learndash_get_topic_list( $for_lesson_id = null, $course_id = null ) {
 		$transient_key = 'learndash_lesson_topics_all';
 	}
 
-	$topics_array = learndash_get_valid_transient( $transient_key );
+	$topics_array = LDLMS_Transients::get( $transient_key );
 
 	if ( false === $topics_array ) {
 
@@ -603,10 +615,10 @@ function learndash_get_topic_list( $for_lesson_id = null, $course_id = null ) {
 						$topics_array[ $lesson_id ][] = $topic;
 					}
 				}
-				set_transient( $transient_key, $topics_array, MINUTE_IN_SECONDS );
+				LDLMS_Transients::set( $transient_key, $topics_array, MINUTE_IN_SECONDS );
 				return $topics_array;
 			} else {
-				set_transient( $transient_key, $topics, MINUTE_IN_SECONDS );
+				LDLMS_Transients::set( $transient_key, $topics, MINUTE_IN_SECONDS );
 				return $topics;
 			}
 		}
@@ -651,7 +663,7 @@ function learndash_get_global_quiz_list( $id = null ){
 			}
 		} else {
 			$transient_key = "learndash_quiz_course_". $course_id;
-			$quizzes_new = learndash_get_valid_transient( $transient_key );
+			$quizzes_new = LDLMS_Transients::get( $transient_key );
 			if ( $quizzes_new === false ) {
 
 				$course_settings = learndash_get_setting( $course_id );
@@ -678,7 +690,7 @@ function learndash_get_global_quiz_list( $id = null ){
 					}
 				}
 			
-				set_transient( $transient_key, $quizzes_new, MINUTE_IN_SECONDS );
+				LDLMS_Transients::set( $transient_key, $quizzes_new, MINUTE_IN_SECONDS );
 			} 
 			return $quizzes_new;
 		}
@@ -701,7 +713,7 @@ function learndash_get_global_quiz_list_OLD( $id = null ){
 	if (!empty($course_id)) {
 
 		$transient_key = "learndash_quiz_course_". $course_id;
-		$quizzes_new = learndash_get_valid_transient( $transient_key );
+		$quizzes_new = LDLMS_Transients::get( $transient_key );
 		if ( $quizzes_new === false ) {
 
 			$course_settings = learndash_get_setting( $course_id );
@@ -734,7 +746,7 @@ function learndash_get_global_quiz_list_OLD( $id = null ){
 				}
 			}
 			
-			set_transient( $transient_key, $quizzes_new, MINUTE_IN_SECONDS );
+			LDLMS_Transients::set( $transient_key, $quizzes_new, MINUTE_IN_SECONDS );
 		} 
 		return $quizzes_new;
 	}

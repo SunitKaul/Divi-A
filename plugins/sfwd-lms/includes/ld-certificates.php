@@ -38,7 +38,7 @@ function learndash_certificate_details( $post_id, $cert_user_id = null ) {
 		$meta = get_post_meta( $post_id, '_sfwd-quiz', true );		
 		if ( is_array( $meta ) && ! empty( $meta ) ) {
 
-			if ( ( isset( $meta['sfwd-quiz_threshold'] ) ) && ( ! empty( $meta['sfwd-quiz_threshold'] ) ) ) {
+			if ( ( isset( $meta['sfwd-quiz_threshold'] ) ) && ( '' !== $meta['sfwd-quiz_threshold'] ) ) {
 				$certificate_threshold = $meta['sfwd-quiz_threshold'];
 			} else {
 				$certificate_threshold = '0.8';

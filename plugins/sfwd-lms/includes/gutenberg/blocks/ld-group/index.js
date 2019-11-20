@@ -38,6 +38,9 @@ registerBlockType(
         description: __( 'This block shows the content if the user is enrolled into the Group.', 'learndash'),
         icon: 'groups',
         category: 'learndash-blocks',
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             group_id: {
                 type: 'string',

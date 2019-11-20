@@ -205,7 +205,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 
 				if ( $new_values !== $old_values ) {
 					if ( ( ! isset( $old_values['has_archive'] ) ) || ( $new_values['has_archive'] !== $old_values['has_archive'] ) ) {
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 
 					//if ( in_array( 'comments', $new_values['supports'] ) ) {

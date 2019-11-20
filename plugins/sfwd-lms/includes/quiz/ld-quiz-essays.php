@@ -1320,14 +1320,10 @@ function learndash_update_quiz_activity( $user_id = 0, $quiz_data = array() ) {
 function learndash_update_quiz_statistics( $quiz_id, $question_id, $updated_quiz_data, $essay ) {
 	global $wpdb;
 
-	$wpdb->wp_pro_quiz_statistic_ref = "{$wpdb->prefix}wp_pro_quiz_statistic_ref";
-	$wpdb->wp_pro_quiz_statistic = "{$wpdb->prefix}wp_pro_quiz_statistic";
-
 	$refId = $wpdb->get_var(
 		$wpdb->prepare("
 					SELECT statistic_ref_id
-					FROM $wpdb->wp_pro_quiz_statistic_ref
-					WHERE quiz_id = %d AND user_id = %d
+					FROM ". LDLMS_DB::get_table_name( 'quiz_statistic_ref' ) ." WHERE quiz_id = %d AND user_id = %d
 				", $quiz_id, $essay->post_author)
 	);
 
@@ -1336,8 +1332,7 @@ function learndash_update_quiz_statistics( $quiz_id, $question_id, $updated_quiz
 	$row = $wpdb->get_results(
 		$wpdb->prepare("
 					SELECT *
-					FROM $wpdb->wp_pro_quiz_statistic
-					WHERE statistic_ref_id = %d AND question_id = %d
+					FROM ". LDLMS_DB::get_table_name( 'quiz_statistic' ) ." WHERE statistic_ref_id = %d AND question_id = %d
 				", $refId, $question_id)
 	);
 
@@ -1354,7 +1349,7 @@ function learndash_update_quiz_statistics( $quiz_id, $question_id, $updated_quiz
 	}
 
 	$update  = $wpdb->update(
-		$wpdb->wp_pro_quiz_statistic,
+		LDLMS_DB::get_table_name( 'quiz_statistic' ),
 		array(
 			'correct_count' => $correct_count,
 			'incorrect_count' => $incorrect_count,

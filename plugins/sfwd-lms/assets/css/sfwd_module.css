@@ -444,6 +444,7 @@ body.post-type-sfwd-transactions .ld-global-header .global-new-entity-button {
 
 
 /* Styles for the Support tab table output */
+/*
 #learndash-settings-support h2 {
 	clear: both;
 }
@@ -476,7 +477,7 @@ body.post-type-sfwd-transactions .ld-global-header .global-new-entity-button {
 #learndash-settings-support table.learndash-support-settings .learndash-support-settings-right {
 	width: 65%;
 }
-
+*/
 
 table#learndash-data-reports,
 table#learndash-data-upgrades {

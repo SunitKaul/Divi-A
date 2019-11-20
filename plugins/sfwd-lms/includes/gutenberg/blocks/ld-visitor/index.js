@@ -40,6 +40,9 @@ registerBlockType(
         title: __( 'LearnDash Visitor', 'learndash' ),
         description: sprintf(_x('This block shows the content if the user is not enrolled into the %s.', 'placeholders: course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: 'visibility',
+        supports: {
+            customClassName: false,
+        },
         category: 'learndash-blocks',
         attributes: {
             course_id: {

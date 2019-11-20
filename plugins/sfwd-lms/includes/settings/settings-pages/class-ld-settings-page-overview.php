@@ -795,7 +795,7 @@ if ( ( class_exists( 'LearnDash_Settings_Page' ) ) && ( ! class_exists( 'LearnDa
 											</div>
 										</div>
 									</div>
-									<div class="ld-bootcamp__accordion--single">
+									<div class="ld-bootcamp__accordion--single <?php echo 'true' === get_option( 'learndash_bootcamp_mark_complete_section_10' ) ? '-completed' : ''; ?>">
 										<h3>
 											<button type="button" class="ld-bootcamp__mark-complete--toggle-indicator" aria-hidden="true" data-id="learndash_bootcamp_mark_complete_section_10" data-nonce="<?php echo esc_attr( wp_create_nonce( 'learndash-bootcamp-mark-complete' ) ); ?>"></button>
 											<button class="ld-bootcamp__accordion--toggle" type="button" aria-selected="false" aria-expanded="false" aria-controls="ld-bootcamp__accordion--content-10" role="tab">

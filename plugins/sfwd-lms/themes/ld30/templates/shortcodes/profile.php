@@ -58,7 +58,13 @@ endif; ?>
             <div class="ld-profile-summary">
                 <div class="ld-profile-card">
                     <div class="ld-profile-avatar">
-                        <?php echo wp_kses_post( get_avatar($user_id) ); ?>
+                        <?php 
+                        /**
+                         * related to the CSS themes/ld30/assets/css/learndash.css
+                         * .learndash-wrapper .ld-profile-summary .ld-profile-card .ld-profile-avatar
+                         */
+                        echo wp_kses_post( get_avatar($user_id, 150) ); 
+                        ?>
                     </div> <!--/.ld-profile-avatar-->
                     <?php
                     if( !empty($current_user->user_lastname) || !empty($current_user->user_firstname) ): ?>
@@ -78,34 +84,47 @@ endif; ?>
 
                     $ld_profile_stats = array(
                         array(
-                            'title' =>  LearnDash_Custom_Label::get_label( 'courses' ) ,
-                            'value' =>  $user_stats['courses'],
+                            'title' => LearnDash_Custom_Label::get_label( 'courses' ) ,
+                            'value' => $user_stats['courses'],
+                            'class' => 'ld-profile-stat-courses',
                         ),
                         array(
-                            'title' =>  __( 'Completed', 'learndash' ),
+                            'title' => __( 'Completed', 'learndash' ),
                             'value' =>  $user_stats['completed'],
+                            'class' =>  'ld-profile-stat-completed',
                         ),
 
                         array(
                             'title' => __( 'Certificates', 'learndash' ),
                             'value' => $user_stats['certificates'],
+                            'class' => 'ld-profile-stat-certificates',
                         )
                     );
 
-					if( isset($shortcode_atts['course_points_user']) && $shortcode_atts['course_points_user'] == 'yes' ) {
+					if ( isset( $shortcode_atts['course_points_user']) && $shortcode_atts['course_points_user'] == 'yes' ) {
 						$ld_profile_stats[] = array(
 		                            'title' => esc_html__( 'Points', 'learndash' ),
-		                            'value' => $user_stats['points']
+                                    'value' => $user_stats['points'],
+                                    'class' => 'ld-profile-stat-points',
 		                        );
-					}
+                    }
 
-                    foreach( $ld_profile_stats as $stat ): ?>
-                        <div class="<?php echo esc_attr( 'ld-profile-stat ld-profile-stat-' . sanitize_title($stat['title']) ); ?>">
-                            <strong><?php echo esc_html($stat['value']); ?></strong>
-                            <span><?php echo esc_html($stat['title']); ?></span>
-                        </div> <!--/.ld-profile-stat-->
-                    <?php
-                    endforeach; ?>
+                    $ld_profile_stats = apply_filters( 'learndash_profile_stats', $ld_profile_stats, $user_id );
+                    if ( ( ! empty( $ld_profile_stats ) ) && ( is_array( $ld_profile_stats ) ) ) {
+                        foreach( $ld_profile_stats as $stat ) { 
+                            $stat_class = 'ld-profile-stat';
+                            if ( ( isset( $stat['class'] ) ) && ( ! empty( $stat['class'] ) ) ) {
+                                $stat_class .= ' ' . $stat['class']; 
+                            }
+                            ?>
+                            <div class="<?php echo esc_attr( $stat_class ); ?>">
+                                <strong><?php echo esc_html($stat['value']); ?></strong>
+                                <span><?php echo esc_html($stat['title']); ?></span>
+                            </div> <!--/.ld-profile-stat-->
+                            <?php
+                        }
+                    }
+                    ?>
                 </div> <!--/.ld-profile-stats-->
             </div>
         <?php endif; ?>

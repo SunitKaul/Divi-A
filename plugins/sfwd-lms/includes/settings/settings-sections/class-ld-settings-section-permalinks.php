@@ -35,11 +35,8 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 
 			add_action( 'admin_init', array( $this, 'admin_init' ) );
 
-			global $wp_rewrite;
-			if ( $wp_rewrite->using_permalinks() ) {
-				parent::__construct();
-				$this->save_settings_fields();
-			}
+			parent::__construct();
+			$this->save_settings_fields();
 		}
 
 		/**
@@ -100,7 +97,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 
 				// As we don't have existing values we want to save here and force the flush rewrite.
 				update_option( $this->settings_section_key, $this->setting_option_values );
-				set_transient( 'sfwd_lms_rewrite_flush', true );
+				learndash_setup_rewrite_flush();
 			}
 
 			$this->setting_option_values = wp_parse_args(
@@ -118,84 +115,99 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 		 * Initialize the metabox settings fields.
 		 */
 		public function load_settings_fields() {
-
-			$this->setting_option_fields = array(
-				'courses'     => array(
-					'name'  => 'courses',
-					'type'  => 'text',
-					'label' => sprintf(
-						// translators: placeholder: Courses.
-						esc_html_x( '%s', 'placeholder: Courses', 'learndash' ),
-						LearnDash_Custom_Label::get_label( 'courses' )
-					),
-					'value' => $this->setting_option_values['courses'],
-					'class' => 'regular-text',
-				),
-				'lessons'     => array(
-					'name'  => 'lessons',
-					'type'  => 'text',
-					'label' => sprintf(
-						// translators: placeholder: Lessons.
-						esc_html_x( '%s', 'placeholder: Lessons', 'learndash' ),
-						LearnDash_Custom_Label::get_label( 'lessons' )
-					),
-					'value' => $this->setting_option_values['lessons'],
-					'class' => 'regular-text',
-				),
-				'topics'      => array(
-					'name'  => 'topics',
-					'type'  => 'text',
-					'label' => sprintf(
-						// translators: placeholder: Topics.
-						esc_html_x( '%s', 'placeholder: Topics', 'learndash' ),
-						LearnDash_Custom_Label::get_label( 'topics' )
-					),
-					'value' => $this->setting_option_values['topics'],
-					'class' => 'regular-text',
-				),
-				'quizzes'     => array(
-					'name'  => 'quizzes',
-					'type'  => 'text',
-					'label' => sprintf(
-						// translators: placeholder: Quizzes.
-						esc_html_x( '%s', 'placeholder: Quizzes', 'learndash' ),
-						LearnDash_Custom_Label::get_label( 'quizzes' )
-					),
-					'value' => $this->setting_option_values['quizzes'],
-					'class' => 'regular-text',
-				),
-				'nested_urls' => array(
-					'name'    => 'nested_urls',
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable Nested URLs', 'learndash' ),
-					'desc'    => sprintf(
-						// translators: placeholders: Lesson, Topic, Quiz, Course, Site Home URL, URL to Course Builder Settings.
-						_x(
-							'This option will restructure %1$s, %2$s and %3$s URLs so they are nested hierarchically within the %4$s URL.<br />For example instead of the default topic URL <code>%5$s</code> the nested URL would be <code>%6$s</code>. If <a href="%7$s">Course Builder Share Steps</a> has been enabled this setting is also automatically enabled.',
-							'placeholders: Lesson, Topic, Quiz, Course, Site Home URL, URL to Course Builder Settings',
-							'learndash'
+			global $wp_rewrite;
+			if ( $wp_rewrite->using_permalinks() ) {
+				$this->setting_option_fields = array(
+					'courses'     => array(
+						'name'  => 'courses',
+						'type'  => 'text',
+						'label' => sprintf(
+							// translators: placeholder: Courses.
+							esc_html_x( '%s', 'placeholder: Courses', 'learndash' ),
+							LearnDash_Custom_Label::get_label( 'courses' )
 						),
-						LearnDash_Custom_Label::get_label( 'lesson' ),
-						LearnDash_Custom_Label::get_label( 'topic' ),
-						LearnDash_Custom_Label::get_label( 'quiz' ),
-						LearnDash_Custom_Label::get_label( 'course' ),
-						get_option( 'home' ) . '/' . $this->setting_option_values['topics'] . '/topic-slug',
-						get_option( 'home' ) . '/' . $this->setting_option_values['courses'] . '/course-slug/' . $this->setting_option_values['lessons'] . '/lesson-slug/' . $this->setting_option_values['topics'] . '/topic-slug',
-						admin_url( 'admin.php?page=courses-options' )
+						'value' => $this->setting_option_values['courses'],
+						'class' => 'regular-text',
 					),
-					'value'   => isset( $this->setting_option_values['nested_urls'] ) ? $this->setting_option_values['nested_urls'] : '',
-					'options' => array(
-						'yes' => __( 'Yes', 'learndash' ),
+					'lessons'     => array(
+						'name'  => 'lessons',
+						'type'  => 'text',
+						'label' => sprintf(
+							// translators: placeholder: Lessons.
+							esc_html_x( '%s', 'placeholder: Lessons', 'learndash' ),
+							LearnDash_Custom_Label::get_label( 'lessons' )
+						),
+						'value' => $this->setting_option_values['lessons'],
+						'class' => 'regular-text',
 					),
-				),
+					'topics'      => array(
+						'name'  => 'topics',
+						'type'  => 'text',
+						'label' => sprintf(
+							// translators: placeholder: Topics.
+							esc_html_x( '%s', 'placeholder: Topics', 'learndash' ),
+							LearnDash_Custom_Label::get_label( 'topics' )
+						),
+						'value' => $this->setting_option_values['topics'],
+						'class' => 'regular-text',
+					),
+					'quizzes'     => array(
+						'name'  => 'quizzes',
+						'type'  => 'text',
+						'label' => sprintf(
+							// translators: placeholder: Quizzes.
+							esc_html_x( '%s', 'placeholder: Quizzes', 'learndash' ),
+							LearnDash_Custom_Label::get_label( 'quizzes' )
+						),
+						'value' => $this->setting_option_values['quizzes'],
+						'class' => 'regular-text',
+					)
+				);
+			}
 
-				'nonce'       => array(
-					'name'  => 'nonce',
-					'type'  => 'hidden',
-					'label' => '',
-					'value' => wp_create_nonce( 'learndash_permalinks_nonce' ),
-					'class' => 'hidden',
+			if ( $wp_rewrite->using_permalinks() ) {
+				$example_regular_topic_url = get_option( 'home' ) . '/' . $this->setting_option_values['topics'] . '/topic-slug';
+				$example_nested_topic_url = get_option( 'home' ) . '/' . $this->setting_option_values['courses'] . '/course-slug/' . $this->setting_option_values['lessons'] . '/lesson-slug/' . $this->setting_option_values['topics'] . '/topic-slug';
+			} else {
+				$example_regular_topic_url = add_query_arg( learndash_get_post_type_slug( 'topic' ), 'topic-slug', get_option( 'home' ) );
+
+				$example_nested_topic_url = get_option( 'home' );
+				$example_nested_topic_url = add_query_arg( learndash_get_post_type_slug( 'course'), 'course-slug', $example_nested_topic_url );
+				$example_nested_topic_url = add_query_arg( learndash_get_post_type_slug( 'lesson' ), 'lesson-slug', $example_nested_topic_url );
+				$example_nested_topic_url = add_query_arg( learndash_get_post_type_slug( 'topic' ), 'topic-slug', $example_nested_topic_url );
+			}
+
+			$this->setting_option_fields['nested_urls'] = array(
+				'name'    => 'nested_urls',
+				'type'    => 'checkbox',
+				'label'   => __( 'Enable Nested URLs', 'learndash' ),
+				'desc'    => sprintf(
+					// translators: placeholders: Lesson, Topic, Quiz, Course, Site Home URL, URL to Course Builder Settings.
+					_x(
+						'This option will restructure %1$s, %2$s and %3$s URLs so they are nested hierarchically within the %4$s URL.<br />For example instead of the default topic URL <code>%5$s</code> the nested URL would be <code>%6$s</code>. If <a href="%7$s">Course Builder Share Steps</a> has been enabled this setting is also automatically enabled.',
+						'placeholders: Lesson, Topic, Quiz, Course, Site Home URL, URL to Course Builder Settings',
+						'learndash'
+					),
+					LearnDash_Custom_Label::get_label( 'lesson' ),
+					LearnDash_Custom_Label::get_label( 'topic' ),
+					LearnDash_Custom_Label::get_label( 'quiz' ),
+					LearnDash_Custom_Label::get_label( 'course' ),
+					$example_regular_topic_url,
+					$example_nested_topic_url,
+					admin_url( 'admin.php?page=courses-options' )
 				),
+				'value'   => isset( $this->setting_option_values['nested_urls'] ) ? $this->setting_option_values['nested_urls'] : '',
+				'options' => array(
+					'yes' => __( 'Yes', 'learndash' ),
+				),
+			);
+
+			$this->setting_option_fields['nonce'] = array(
+				'name'  => 'nonce',
+				'type'  => 'hidden',
+				'label' => '',
+				'value' => wp_create_nonce( 'learndash_permalinks_nonce' ),
+				'class' => 'hidden',
 			);
 
 			$this->setting_option_fields = apply_filters( 'learndash_settings_fields', $this->setting_option_fields, $this->settings_section_key );
@@ -216,36 +228,31 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 					if ( ( isset( $post_fields['courses'] ) ) && ( ! empty( $post_fields['courses'] ) ) ) {
 						$this->setting_option_values['courses'] = $this->esc_url( $post_fields['courses'] );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 
 					if ( ( isset( $post_fields['lessons'] ) ) && ( ! empty( $post_fields['lessons'] ) ) ) {
 						$this->setting_option_values['lessons'] = $this->esc_url( $post_fields['lessons'] );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 
 					if ( ( isset( $post_fields['topics'] ) ) && ( ! empty( $post_fields['topics'] ) ) ) {
 						$this->setting_option_values['topics'] = $this->esc_url( $post_fields['topics'] );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 
 					if ( ( isset( $post_fields['quizzes'] ) ) && ( ! empty( $post_fields['quizzes'] ) ) ) {
 						$this->setting_option_values['quizzes'] = $this->esc_url( $post_fields['quizzes'] );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 
 					if ( ( isset( $post_fields['nested_urls'] ) ) && ( ! empty( $post_fields['nested_urls'] ) ) ) {
 						$this->setting_option_values['nested_urls'] = $this->esc_url( $post_fields['nested_urls'] );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					} else {
 						// We check the Course Options > Course Builder setting. If this is set to 'yes' then we MUST keep the nested URLs set to true.
 						if ( ! isset( $this->setting_option_values['nested_urls'] ) ) {
@@ -253,16 +260,15 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 						}
 
 						if ( 'yes' !== $this->setting_option_values['nested_urls'] ) {
-							$learndash_settings_courses_builder = get_option( 'learndash_settings_courses_builder', array() );
-							if ( ! isset( $learndash_settings_courses_builder['shared_steps'] ) ) {
-								$learndash_settings_courses_builder['shared_steps'] = 'no';
+							$learndash_settings_courses_builder = get_option( 'learndash_settings_courses_management_display', array() );
+							if ( ! isset( $learndash_settings_courses_builder['course_builder_shared_steps'] ) ) {
+								$learndash_settings_courses_builder['course_builder_shared_steps'] = 'no';
 							}
 
-							if ( 'yes' === $learndash_settings_courses_builder['shared_steps'] ) {
+							if ( 'yes' === $learndash_settings_courses_builder['course_builder_shared_steps'] ) {
 								$this->setting_option_values['nested_urls'] = 'yes';
 
-								// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-								set_transient( 'sfwd_lms_rewrite_flush', true );
+								learndash_setup_rewrite_flush();
 							}
 						}
 					}

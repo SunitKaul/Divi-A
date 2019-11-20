@@ -46,6 +46,9 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 				'visible_after'               => 'visible_after',
 				'visible_after_specific_date' => 'visible_after_specific_date',
 			);
+			if ( 'yes' === LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Courses_Builder', 'shared_steps' ) ) {
+				unset( $this->settings_fields_map['course'] );
+			}
 
 			parent::__construct();
 		}
@@ -276,6 +279,9 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 
 				if ( ( ! isset( $settings_values['course'] ) ) || ( '-1' === $settings_values['course'] ) ) {
 					$settings_values['course'] = '';
+				}
+				if ( 'yes' === LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Courses_Builder', 'shared_steps' ) ) {
+					unset( $settings_values['course'] );
 				}
 			}
 

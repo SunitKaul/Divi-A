@@ -215,7 +215,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 								'yes' => sprintf(
 									// translators: placeholders: Lesson, topics and quizzes, courses.
 									esc_html_x( '%1$s, %2$s and %3$s can be shared across multiple %4$s', 'placeholders: Lesson, topics and quizzes, courses', 'learndash' ),
-									learndash_get_custom_label( 'lesson' ),
+									learndash_get_custom_label( 'lessons' ),
 									learndash_get_custom_label_lower( 'topics' ),
 									learndash_get_custom_label_lower( 'quizzes' ),
 									learndash_get_custom_label_lower( 'courses' )
@@ -385,10 +385,13 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 					// Manage Course Builder, Per Page, and Share Steps.
 					if ( ( isset( $current_values['course_builder_enabled'] ) ) && ( 'yes' === $current_values['course_builder_enabled'] ) ) {
 						$current_values['course_builder_per_page'] = absint( $current_values['course_builder_per_page'] );
+						
 					} else {
 						$current_values['course_builder_shared_steps'] = '';
 						$current_values['course_builder_per_page']     = LEARNDASH_LMS_DEFAULT_WIDGET_PER_PAGE;
+					}
 
+					if ( ( isset( $current_values['course_builder_shared_steps'] ) ) && ( 'yes' === $current_values['course_builder_shared_steps'] ) ) {
 						$current_values['lesson_topic_order_enabled'] = '';
 					}
 
@@ -434,8 +437,7 @@ if ( ( class_exists( 'LearnDash_Settings_Section' ) ) && ( ! class_exists( 'Lear
 
 						update_option( 'learndash_settings_permalinks', $ld_permalink_options );
 
-						// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed.
-						set_transient( 'sfwd_lms_rewrite_flush', true );
+						learndash_setup_rewrite_flush();
 					}
 				}
 			}

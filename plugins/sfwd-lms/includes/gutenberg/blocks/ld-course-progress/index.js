@@ -21,7 +21,7 @@ const {
 	registerBlockType,
 } = wp.blocks;
 
- const {
+const {
     InnerBlocks,
     InspectorControls,
 } = wp.editor;
@@ -46,6 +46,14 @@ registerBlockType(
         description: sprintf(_x('This block displays users progress bar for the %1$s.', 'placeholders: course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: iconEl,
         category: 'learndash-blocks',
+        example: {
+            attributes: {
+                example_show: 1,
+            },
+        },
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             course_id: {
                 type: 'string',
@@ -60,12 +68,19 @@ registerBlockType(
                 default: 1
             },
             preview_user_id: {
-                type: 'integer',
+                type: 'string',
+            },
+            preview_course_id: {
+                type: 'string',
+            },
+            example_show: {
+                type: 'boolean',
+                default: 0
             },
         },
         edit: props => {
             let { attributes: { course_id }, className } = props;
-			const { attributes: { user_id, preview_show, preview_user_id },
+            const { attributes: { user_id, preview_show, preview_user_id, preview_course_id, example_show },
             	setAttributes } = props;
 
             const inspectorControls = (
@@ -94,6 +109,13 @@ registerBlockType(
                             label={__('Show Preview', 'learndash')}
                             checked={!!preview_show}
                             onChange={preview_show => setAttributes({ preview_show })}
+                        />
+                        <TextControl
+                            label={sprintf(_x('%s ID', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course'))}
+                            help={sprintf(_x('Enter a %s ID to test preview', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course'))}
+                            value={preview_course_id || ''}
+                            type={'number'}
+                            onChange={preview_course_id => setAttributes({ preview_course_id })}
                         />
                         <TextControl
                             label={__('User ID', 'learndash')}

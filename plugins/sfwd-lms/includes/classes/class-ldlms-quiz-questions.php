@@ -116,6 +116,8 @@ if ( ! class_exists( 'LDLMS_Quiz_Questions' ) ) {
 		 * Load Quiz Questions.
 		 */
 		public function load_questions() {
+			global $pagenow;
+
 			$this->init();
 
 			if ( ( false === $this->questions_loaded ) || ( $this->is_questions_dirty() ) ) {
@@ -125,7 +127,12 @@ if ( ! class_exists( 'LDLMS_Quiz_Questions' ) ) {
 					$this->questions = array();
 				}
 
-				$this->questions['post_ids'] = get_post_meta( $this->quiz_primary_id, 'ld_quiz_questions', true );
+				// A new Quiz will not yet have questions.
+				if ( ( is_admin() ) && ( 'post-new.php' === $pagenow ) ) {
+					$this->questions['post_ids'] = array();
+				} else {
+					$this->questions['post_ids'] = get_post_meta( $this->quiz_primary_id, 'ld_quiz_questions', true );
+				}
 
 				if ( ! is_array( $this->questions['post_ids'] ) ) {
 					$this->questions_dirty = true;
@@ -165,7 +172,8 @@ if ( ! class_exists( 'LDLMS_Quiz_Questions' ) ) {
 							),
 							array(
 								'key'     => 'ld_quiz_' . $this->quiz_primary_id,
-								'compare' => 'EXISTS',
+								'value'   => $this->quiz_primary_id,
+								'compare' => '=',
 							),
 						);
 					} else {

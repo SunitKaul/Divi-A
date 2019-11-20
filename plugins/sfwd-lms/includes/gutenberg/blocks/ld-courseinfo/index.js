@@ -40,6 +40,9 @@ registerBlockType(
 		description: sprintf(_x('This block displays %s related information', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course') ),
 		icon: 'analytics',
 		category: 'learndash-blocks',
+		supports: {
+			customClassName: false,
+		},
         attributes: {
             show: {
                 type: 'string',

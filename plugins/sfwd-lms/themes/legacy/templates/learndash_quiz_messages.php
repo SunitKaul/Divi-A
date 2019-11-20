@@ -209,7 +209,7 @@ switch( $context ) {
 	// ------------- Headers -------------
 	// -----------------------------------
 
-	// Default Message: 'Quiz-summary'
+	// Default Message: 'Quiz Summary'
 	// Notes: This header is wrapped in <h4></h4>
 	case 'quiz_quiz_summary_header':
 		// Add alternate message here
@@ -296,9 +296,9 @@ switch( $context ) {
 		// Add alternate message here
 		break;
 	
-	// Default Message: 'Quiz-summary'
+	// Default Message: 'Quiz Summary'
 	// Notes: This is a button label and should only contain simple text not HTML
-	case 'quiz_summary_button_label':
+	case 'quiz_quiz_summary_button_label':
 		// Add alternate message here
 		break;
 	

@@ -20,7 +20,7 @@ require_once __DIR__ . '/class-ld-settings-fields-multiselect.php';
 require_once __DIR__ . '/class-ld-settings-fields-wpeditor.php';
 require_once __DIR__ . '/class-ld-settings-fields-colorpicker.php';
 require_once __DIR__ . '/class-ld-settings-fields-media-upload.php';
-
+require_once __DIR__ . '/class-ld-settings-fields-url.php';
 require_once __DIR__ . '/class-ld-settings-fields-checkbox-switch.php';
 
 // Specialty fields.

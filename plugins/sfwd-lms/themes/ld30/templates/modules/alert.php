@@ -45,7 +45,9 @@ if( isset($message) && !empty($message) ):
              */
             do_action( 'learndash-alert-icon-after', $class, $icon, $message );
 
+            ?><div class="ld-alert-messages"><?php
             echo wp_kses_post( $message );
+            ?></div><?php
 
             /**
              * Add content after an alert message

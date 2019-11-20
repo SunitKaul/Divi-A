@@ -211,7 +211,7 @@ if ( ! class_exists( 'Learndash_Admin_User_Profile_Edit' ) ) {
 				<p><input type="checkbox" id="learndash_delete_user_data" name="learndash_delete_user_data" value="<?php echo (int) $user->ID; ?>"> <label for="learndash_delete_user_data"><?php echo wp_kses_post( __( 'Check and click update profile to permanently delete user\'s LearnDash course data. <strong>This cannot be undone.</strong>', 'learndash' ) ); ?></label></p>
 				<?php
 					global $wpdb;
-					$sql_str = $wpdb->prepare( "SELECT quiz_id as proquiz_id FROM " . $wpdb->prefix . "wp_pro_quiz_lock WHERE user_id=%d", $user->ID );
+					$sql_str = $wpdb->prepare( "SELECT quiz_id as proquiz_id FROM " . LDLMS_DB::get_table_name( 'quiz_lock' ) . " WHERE user_id=%d", $user->ID );
 					$proquiz_ids = $wpdb->get_col( $sql_str );
 					if ( ! empty( $proquiz_ids ) ) {
 						$quiz_ids = array();

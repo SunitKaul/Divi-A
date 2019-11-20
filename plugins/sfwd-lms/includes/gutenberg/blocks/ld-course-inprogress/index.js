@@ -40,6 +40,9 @@ registerBlockType(
         description: sprintf(_x('This block shows the content if the user is enrolled into the %s but not yet completed.', 'placeholder: course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: 'star-half',
         category: 'learndash-blocks',
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             course_id: {
                 type: 'string',

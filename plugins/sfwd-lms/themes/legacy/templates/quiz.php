@@ -17,7 +17,8 @@
  * $user_id         : (object) Current User ID
  * $logged_in       : (true/false) User is logged in
  * $current_user    : (object) Currently logged in user object
- * $post            : (object) The quiz post object
+ * $post            : (object) The quiz post object () (Deprecated in LD 3.1. User $quiz_post instead).
+ * $quiz_post       : (object) The quiz post object ().
  * $lesson_progression_enabled  : (true/false)
  * $show_content    : (true/false) true if user is logged in and lesson progression is disabled or if previous lesson and topic is completed.
  * $attempts_left   : (true/false)
@@ -34,9 +35,13 @@
  * @package LearnDash\Quiz
  */
 
+ if ( ( ! isset( $quiz_post ) ) || ( ! is_a( $quiz_post, 'WP_Post' ) ) ) {
+    return;
+}
+
 if ( ! empty( $lesson_progression_enabled ) ) {
 
-	$last_incomplete_step = is_quiz_accessable( null, $post, true );
+	$last_incomplete_step = is_quiz_accessable( null, $quiz_post, true, $course_id );
 	if ( 1 !== $last_incomplete_step ) {
 		if ( is_a( $last_incomplete_step, 'WP_Post' ) ) {
 			if ( $last_incomplete_step->post_type === learndash_get_post_type_slug( 'topic' ) ) {

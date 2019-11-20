@@ -77,6 +77,9 @@ if ( ( class_exists( 'LearnDash_Gutenberg_Block' ) ) && ( ! class_exists( 'Learn
 				'col'                    => array(
 					'type' => 'string',
 				),
+				'example_show' => array(
+					'type' => 'boolean',
+				),
 			);
 			$this->self_closing     = true;
 
@@ -98,7 +101,6 @@ if ( ( class_exists( 'LearnDash_Gutenberg_Block' ) ) && ( ! class_exists( 'Learn
 		public function render_block( $attributes = array() ) {
 
 			if ( is_user_logged_in() ) {
-
 				$attributes           = apply_filters( 'learndash_block_markers_shortcode_atts', $attributes, $this->shortcode_slug, $this->block_slug, '' );
 				$shortcode_params_str = $this->prepare_course_list_atts_to_param( $attributes );
 				$shortcode_params_str = '[' . $this->shortcode_slug . ' ' . $shortcode_params_str . ']';
@@ -147,7 +149,7 @@ if ( ( class_exists( 'LearnDash_Gutenberg_Block' ) ) && ( ! class_exists( 'Learn
 					$attributes['categoryselector'] = 'true';
 				}
 
-				if ( ( isset( $attributes['course_grid'] ) ) && ( true === $attributes['course_grid'] ) ) {
+				if ( ( ! isset( $attributes['course_grid'] ) ) || ( true === $attributes['course_grid'] ) ) {
 					$attributes['course_grid'] = 'true';
 				}
 

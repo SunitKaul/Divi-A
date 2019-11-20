@@ -235,7 +235,9 @@ echo SFWD_LMS::get_template(
 if ( apply_filters('learndash_course_steps_expand_all', $shortcode_atts['expand_all'], 0, 'profile_shortcode' ) ) { ?>
 	<script>
 		jQuery(document).ready(function() {
-			jQuery("#learndash_profile .list_arrow").trigger('click');
+			setTimeout(function(){
+				jQuery("#learndash_profile .list_arrow").trigger('click');
+			}, 1000);
 		});
 	</script>	
 <?php }

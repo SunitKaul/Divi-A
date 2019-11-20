@@ -32,7 +32,7 @@ foreach( $quizzes as $k => $v ):
         if ((isset($c['certificateLink'])) && (!empty($c['certificateLink'])))
             $certificateLink = $c['certificateLink'];
 
-        if ((isset($c['certificate_threshold'])) && (!empty($c['certificate_threshold'])))
+        if ((isset($c['certificate_threshold'])) && ('' !== $c['certificate_threshold']))
             $certificate_threshold = $c['certificate_threshold'];
 
         $passstatus = isset( $v['pass'] ) ? ( ( $v['pass'] == 1 ) ? 'green' : 'red' ) : '';

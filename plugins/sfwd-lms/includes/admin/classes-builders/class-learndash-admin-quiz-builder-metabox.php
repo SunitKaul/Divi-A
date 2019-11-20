@@ -267,9 +267,11 @@ if ( ( ! class_exists( 'Learndash_Admin_Metabox_Quiz_Builder' ) ) && ( class_exi
 
 					// Next get any quiz where the 'quiz_id' is zero.
 					$m_args['meta_query'] = array(
-						'key'     => 'quiz_id',
-						'value'   => 0,
-						'compare' => '=',
+						array(
+							'key'     => 'quiz_id',
+							'value'   => 0,
+							'compare' => '=',
+						)
 					);
 					$m_post_type_query = new WP_Query( $m_args );
 					if ( ( property_exists( $m_post_type_query, 'posts' ) ) && ( ! empty( $m_post_type_query->posts ) ) ) {
@@ -865,6 +867,8 @@ if ( ( ! class_exists( 'Learndash_Admin_Metabox_Quiz_Builder' ) ) && ( class_exi
 		 * @param array $query_args array of values for AJAX request.
 		 */
 		public function learndash_builder_selector_step_new( $query_args = array() ) {
+			global $wpdb;
+
 			$reply_data = array();
 			$reply_data['new_steps'] = array();
 
@@ -890,6 +894,16 @@ if ( ( ! class_exists( 'Learndash_Admin_Metabox_Quiz_Builder' ) ) && ( class_exi
 
 						$new_step_id = wp_insert_post( apply_filters( 'course_builder_selector_new_step_post_args', $post_args ) );
 						if ( $new_step_id ) {
+							/**
+							 * We have to set the guid manually because the one assigned within wp_insert_post is non-unique. 
+							 * See LEARNDASH-3853
+							 */ 
+							$wpdb->update(
+								$wpdb->posts, 
+								array( 'guid' => add_query_arg( array( 'post_type' => $step_set['post_type'], 'p' => $new_step_id ), home_url() ) ),  
+								array( 'ID' => $new_step_id )
+							);
+
 							if ( 'sfwd-question' === $post_args['post_type'] ) {
 								$question_pro_id = learndash_update_pro_question( 0, $post_args );
 								if ( ! empty( $question_pro_id ) ) {

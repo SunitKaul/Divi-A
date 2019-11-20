@@ -21,7 +21,7 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 		 *
 		 * @var array $table_sections.
 		 */
-		private static $tables = array(
+		private static $tables_base = array(
 			'activity'  => array(
 				'user_activity'      => 'user_activity',
 				'user_activity_meta' => 'user_activity_meta',
@@ -40,6 +40,8 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 			),
 		);
 
+		private static $tables = array();
+
 		/**
 		 * Public constructor for class
 		 *
@@ -53,35 +55,53 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 		 *
 		 * @since 2.6.0
 		 */
-		public static function init() {
-			/**
-			 * We really only need to build the full table names once. So
-			 * we use a static flag to control the processing.
-			 */
-			static $init_called = false;
+		public static function init( $force_reload = false ) {
 
-			if ( true !== $init_called ) {
-				$init_called = true;
+			$blog_id = get_current_blog_id();
 
+			if ( ( true === $force_reload ) || ( ! isset( self::$tables[ $blog_id ] ) ) || ( empty( self::$tables[ $blog_id ] ) ) ) {
+				self::$tables[ $blog_id ] = array();
 				/**
 				 * Fitler the list of custom database tables.
 				 *
 				 * @since 2.6.0
 				 */
-				self::$tables = apply_filters( 'learndash_custom_database_tables', self::$tables );
+				self::$tables_base = apply_filters( 'learndash_custom_database_tables', self::$tables_base );
 
-				if ( ! empty( self::$tables ) ) {
-					foreach ( self::$tables as $section_key  => $section_tables ) {
+				if ( ! empty( self::$tables_base ) ) {
+					foreach ( self::$tables_base as $section_key  => $section_tables ) {
 						if ( ( ! empty( $section_tables ) ) && ( is_array( $section_tables ) ) ) {
 							foreach ( $section_tables as $table_key => $table_name ) {
-								self::$tables[ $section_key ][ $table_key ] = self::get_table_prefix( $section_key ) . $table_name;
+								self::$tables[ $blog_id ][ $section_key ][ $table_key ] = self::get_table_prefix( $section_key ) . $table_name;
 							}
 						}
 					}
 				}
-
-				//error_log('tables<pre>'. print_r(self::$tables, true) .'</pre>');
 			}
+		}
+
+		public static function get_tables_base( $table_section = '', $return_sections = false ) {
+			$tables_return = array();
+
+			if ( ! empty( $table_section ) ) {
+				if ( isset( self::$tables_base[ $table_section ] ) ) {
+					if ( true === $return_sections ) {
+						$tables_return[ $table_section ] = self::$tables_base[ $table_section ];
+					} else {
+						$tables_return = self::$tables_base[ $table_section ];
+					}
+				}
+			} else {
+				if ( true === $return_sections ) {
+					$tables_return = self::$tables_base;
+				} else {
+					foreach ( self::$tables_base as $section_key  => $section_tables ) {
+						$tables_return = array_merge( $tables_return, $section_tables );
+					}
+				}
+			}
+
+			return $tables_return;
 		}
 
 		/**
@@ -95,26 +115,28 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 		 * @return array of table names.
 		 */
 		public static function get_tables( $table_section = '', $return_sections = false ) {
-			global $wpdb;
-
 			$tables_return = array();
+
+			$blog_id = get_current_blog_id();
 
 			self::init();
 
-			if ( ! empty( $table_section ) ) {
-				if ( isset( self::$tables[ $table_section ] ) ) {
-					if ( true === $return_sections ) {
-						$tables_return[ $table_section ] = self::$tables[ $table_section ];
-					} else {
-						$tables_return = self::$tables[ $table_section ];
+			if ( ( isset( self::$tables[ $blog_id ] ) ) && ( ! empty( self::$tables[ $blog_id ] ) ) ) {
+				if ( ! empty( $table_section ) ) {
+					if ( isset( self::$tables[ $blog_id ][ $table_section ] ) ) {
+						if ( true === $return_sections ) {
+							$tables_return[ $table_section ] = self::$tables[$blog_id ][ $table_section ];
+						} else {
+							$tables_return = self::$tables[ $blog_id ][ $table_section ];
+						}
 					}
-				}
-			} else {
-				if ( true === $return_sections ) {
-					$tables_return = self::$table;
 				} else {
-					foreach ( self::$tables as $section_key  => $section_tables ) {
-						$tables_return = array_merge( $tables_return, $section_tables );
+					if ( true === $return_sections ) {
+						$tables_return = self::$table[ $blog_id ];
+					} else {
+						foreach ( self::$tables[ $blog_id ] as $section_key  => $section_tables ) {
+							$tables_return = array_merge( $tables_return, $section_tables );
+						}
 					}
 				}
 			}
@@ -134,32 +156,65 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 		public static function get_table_prefix( $table_section = '' ) {
 			global $wpdb;
 
+			$table_prefix = $wpdb->prefix;
+
 			switch ( $table_section ) {
 
 				case 'wpproquiz':
-					//require_once( LEARNDASH_LMS_PLUGIN_DIR .'includes/admin/class-learndash-admin-data-upgrades.php' );
-					//$ld_admin_data_upgrades = Learndash_Admin_Data_Upgrades::get_instance();
-					//$data_settings = $ld_admin_data_upgrades->get_data_settings( 'rename-wpproquiz-tables' );
-					//error_log('wpproquizz - data_settings<pre>'. print_r($data_settings, true) .'</pre>');
-
-					$table_prefix = $wpdb->prefix . 'wp_pro_quiz_';
+					$table_prefix = $wpdb->prefix . self::get_table_sub_prefix( $table_section ) . 'pro_quiz_';
 					break;
 
-				//case 'wpproquiz_new':
-				//	$table_prefix = $wpdb->prefix . 'learndash_quiz_';
-				//	break;
-
 				case 'activity':
-				//case 'learndash':
-					$table_prefix = $wpdb->prefix . 'learndash_';
+					$table_prefix = $wpdb->prefix . self::get_table_sub_prefix( $table_section );
 					break;
 
 				default:
-					$table_prefix = $wpdb->prefix;
 					break;
 			}
 
-			return $table_prefix;
+			return apply_filters( 'learndash_table_prefix', $table_prefix, $table_section );
+		}
+
+		public static function get_table_sub_prefix( $table_section = '' ) {
+			$table_sub_prefix = '';
+
+			switch ( $table_section ) {
+
+				case 'wpproquiz':
+					if ( ( defined( 'LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB' ) ) && ( LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB ) ) {
+						$table_sub_prefix = esc_attr( LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB );
+					} else {
+						if ( ! class_exists( 'Learndash_Admin_Data_Upgrades' ) ) {
+							require_once( LEARNDASH_LMS_PLUGIN_DIR .'includes/admin/class-learndash-admin-data-upgrades.php' );
+						}
+						$data_upgrade_proquiz_tables = Learndash_Admin_Data_Upgrades::get_instance( 'Learndash_Admin_Data_Upgrades_Rename_WPProQuiz_Tables' );
+						$data_settings = $data_upgrade_proquiz_tables->init_settings();
+						if ( isset( $data_settings['prefixes']['current'] ) ) {
+							$table_sub_prefix = $data_settings['prefixes']['current'];
+						} else {
+							if ( ( defined( 'LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB_DEFAULT' ) ) && ( LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB_DEFAULT ) ) {
+								$table_sub_prefix = esc_attr( LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB_DEFAULT );
+							} else {
+								$table_sub_prefix = 'wp_';
+							}
+						}
+					}
+					
+					break;
+
+				case 'activity':
+					if ( ( defined( 'LEARNDASH_LMS_DATABASE_PREFIX_SUB' ) ) && ( LEARNDASH_LMS_DATABASE_PREFIX_SUB ) ) {
+						$table_sub_prefix = esc_attr( LEARNDASH_LMS_DATABASE_PREFIX_SUB );
+					} else {
+						$table_sub_prefix = 'learndash_';
+					}
+					break;
+
+				default:
+					break;
+			}
+
+			return apply_filters( 'learndash_table_sub_prefix', $table_sub_prefix, $table_section );		
 		}
 
 		/**
@@ -173,8 +228,6 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 		 * @return string Table Name if found.
 		 */
 		public static function get_table_name( $table_name = '', $table_section = '' ) {
-			global $wpdb;
-
 			$tables = self::get_tables( $table_section );
 			if ( isset( $tables[ $table_name ] ) ) {
 				return $tables[ $table_name ];
@@ -188,3 +241,12 @@ if ( ! class_exists( 'LDLMS_DB' ) ) {
 // These are the base table names WITHOUT the $wpdb->prefix.
 global $learndash_db_tables;
 $learndash_db_tables = LDLMS_DB::get_tables();
+
+
+/*
+add_action( 'switch_blog', function( $new_blog, $prev_blog_id ) {
+	if ( $new_blog !== $prev_blog_id ) {
+		LDLMS_DB::init(true);
+	}
+}, 10, 2 );
+*/

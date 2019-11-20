@@ -397,7 +397,7 @@ if ( ! class_exists( 'nss_plugin_updater_sfwd_lms' ) ) {
 		 */
 		public function getRemote_version() {
 			if ( ! empty( $this->update_path ) ) {
-				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'version' ) ) );
+				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'version' ), 'timeout' => LEARNDASH_HTTP_REMOTE_POST_TIMEOUT ) );
 				if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 					return $request['body'];
 				}
@@ -413,7 +413,7 @@ if ( ! class_exists( 'nss_plugin_updater_sfwd_lms' ) ) {
 		 */
 		public function getRemote_information() {
 			if ( ! empty( $this->update_path ) ) {
-				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'info' ) ) );
+				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'info' ), 'timeout' => LEARNDASH_HTTP_REMOTE_POST_TIMEOUT ) );
 
 				if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 					$information = @unserialize( $request['body'] );
@@ -459,7 +459,7 @@ if ( ! class_exists( 'nss_plugin_updater_sfwd_lms' ) ) {
 		 */
 		public function getRemote_license() {
 			if ( ! empty( $this->update_path ) ) {
-				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'license' ) ) );
+				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'license' ), 'timeout' => LEARNDASH_HTTP_REMOTE_POST_TIMEOUT ) );
 
 				if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 
@@ -485,7 +485,7 @@ if ( ! class_exists( 'nss_plugin_updater_sfwd_lms' ) ) {
 		 */
 		public function getRemote_current_license() {
 			if ( ! empty( $this->update_path ) ) {
-				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'current_license' ) ) );
+				$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'current_license' ), 'timeout' => LEARNDASH_HTTP_REMOTE_POST_TIMEOUT ) );
 
 				if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 					if ( $request['body'] == 'not_found' ) {

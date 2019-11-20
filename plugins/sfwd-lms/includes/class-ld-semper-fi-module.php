@@ -1131,7 +1131,7 @@ if ( ! class_exists( 'Semper_Fi_Module' ) ) {
 						learndash_convert_settings_to_single( $post_id, $options, $k );
 						
 						// Purge the LD transients when we save any of our post types.
-						learndash_purge_transients();
+						LDLMS_Transients::purge_all();
 					}
 				}
 			}

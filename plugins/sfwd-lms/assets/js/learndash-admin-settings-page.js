@@ -174,38 +174,33 @@ jQuery(document).ready(function() {
 	/**
 	 * On the Course Settings metabox. If it contains no items we remove the metabox.
 	 */
-	/*
-	if (!jQuery('body.post-type-sfwd-courses #sfwd-courses.postbox .sfwd_input').length) {
-		jQuery('body.post-type-sfwd-courses #sfwd-courses.postbox').hide();
+	if (!jQuery('body.post-type-sfwd-courses #sfwd-courses.postbox .inside .sfwd_input').length) {
+		jQuery('body.post-type-sfwd-courses #sfwd-courses.postbox').remove();
 	}
-	*/
 
 	/**
 	 * On the Lesson Settings metabox. If it contains no items we remove the metabox.
 	 */
-	/*
-	if (!jQuery('body.post-type-sfwd-lessons #sfwd-lessons.postbox .sfwd_input').length) {
-		jQuery('body.post-type-sfwd-lessons #sfwd-lessons.postbox').hide();
+	
+	if (!jQuery('body.post-type-sfwd-lessons #sfwd-lessons.postbox .inside .sfwd_input').length) {
+		jQuery('body.post-type-sfwd-lessons #sfwd-lessons.postbox').remove();
 	}
-	*/
-
+	
 	/**
 	 * On the Lesson Settings metabox. If it contains no items we remove the metabox.
 	 */
-	/*
-	if (!jQuery('body.post-type-sfwd-topic #sfwd-topic.postbox .sfwd_input').length) {
-		jQuery('body.post-type-sfwd-topic #sfwd-topic.postbox').hide();
+	
+	if (!jQuery('body.post-type-sfwd-topic #sfwd-topic.postbox .inside .sfwd_input').length) {
+		jQuery('body.post-type-sfwd-topic #sfwd-topic.postbox').remove();
 	}
-	*/
-
+	
 	/**
 	 * On the Quiz Settings metabox. If it contains no items we remove the metabox.
 	 */
-	/*
-	if (!jQuery('body.post-type-sfwd-topic #sfwd-quiz.postbox .sfwd_input').length) {
+	
+	if (!jQuery('body.post-type-sfwd-topic #sfwd-quiz.postbox .inside .sfwd_input').length) {
 		jQuery('body.post-type-sfwd-topic #sfwd-quiz.postbox').hide();
 	}
-	*/
 	
 	/**
 	 * For the checkbox-switch can have dual labels. One for the 'on' state and one for the 
@@ -1016,6 +1011,29 @@ jQuery(document).ready(function() {
 			});
 		});
 	}
+
+
+	jQuery('form#ld_data_remove_form').submit( function( event ) {
+		var ld_data_remove_verify = jQuery('input#ld_data_remove_verify').val();
+		var ld_data_remove_confirm = jQuery('input#ld_data_remove_verify').data('confirm');
+
+		if ((typeof ld_data_remove_verify === 'undefined') || (typeof ld_data_remove_confirm === 'undefined')) {
+			event.preventDefault();
+			return;
+		}
+
+		ld_data_remove_verify = ld_data_remove_verify.trim();
+		if ((ld_data_remove_verify === '') || (ld_data_remove_confirm === '')) {
+			event.preventDefault();
+			return;
+		}
+		
+		if (!confirm(ld_data_remove_confirm ) ) {
+			event.preventDefault();
+			return;
+		}
+		// If we get to here the form will submit.
+	});
 });
 
 function learndash_course_edit_page_billing_cycle_javascript() {

@@ -239,6 +239,17 @@ if ( ! class_exists( 'SFWD_CPT_Instance' ) ) {
 				return $content;
 			}
 
+			// Remove our hook that got us here in case the 'the_content' filter needs to be called down deeper in the template logic.
+			/**
+			 * Remove the hook into the WP 'the_content' filter once we are in our handler. This
+			 * will allow other templates to call the 'the_content' filter without causing recusion.
+			 * @since 3.1
+			 * @var boolean true Default true to remove the filter. Return false to not remove.
+			 */
+			if ( apply_filters( 'learndash_remove_template_content_filter', false ) ) {
+				remove_filter( 'the_content', array( $this, 'template_content' ), 1000 );
+			}
+
 			if ( is_user_logged_in() ) {
 				$user_id = get_current_user_id();
 			} else {
@@ -372,6 +383,7 @@ if ( ! class_exists( 'SFWD_CPT_Instance' ) ) {
 							$materials = wp_specialchars_decode( $course_settings['course_materials'], ENT_QUOTES );
 							if ( ! empty( $materials ) ) {
 								$materials = do_shortcode( $materials );
+								$materials = wpautop( $materials );
 							}
 						}
 						
@@ -404,7 +416,9 @@ if ( ! class_exists( 'SFWD_CPT_Instance' ) ) {
 							}
 						}
 
-						include_once __DIR__ . '/vendor/paypal/enhanced-paypal-shortcodes.php';
+						//include_once __DIR__ . '/vendor/paypal/enhanced-paypal-shortcodes.php';
+						require_once( LEARNDASH_LMS_LIBRARY_DIR . '/paypal/enhanced-paypal-shortcodes.php' );
+						
 						$level = ob_get_level();
 						ob_start();
 						$template_file = SFWD_LMS::get_template( 'course', null, null, true );
@@ -503,6 +517,7 @@ if ( ! class_exists( 'SFWD_CPT_Instance' ) ) {
 								$materials = wp_specialchars_decode( $lesson_settings['lesson_materials'], ENT_QUOTES );
 								if ( ! empty( $materials ) ) {
 									$materials = do_shortcode( $materials );
+									$materials = wpautop( $materials );
 								}
 							}
 
@@ -622,6 +637,7 @@ if ( ! class_exists( 'SFWD_CPT_Instance' ) ) {
 								$materials = wp_specialchars_decode( $topic_settings['topic_materials'], ENT_QUOTES );
 								if ( ! empty( $materials ) ) {
 									$materials = do_shortcode( $materials );
+									$materials = wpautop( $materials );
 								}
 							}
 

@@ -139,7 +139,9 @@ global $course_pager_results;
 				<?php if ( apply_filters( 'learndash_course_steps_expand_all', false, $course_id, 'course_lessons_listing_main' ) ) { ?>
 					<script>
 						jQuery(document).ready(function(){
-							jQuery("#learndash_post_<?php echo $course_id; ?> .learndash_topic_dots").slideDown();
+							setTimeout(function(){
+								jQuery("#learndash_post_<?php echo $course_id; ?> .learndash_topic_dots").slideDown();
+							}, 1000);
 						});
 					</script>	
 				<?php } ?>

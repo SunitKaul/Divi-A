@@ -163,6 +163,24 @@ if ( typeof learndash_video_data !== 'undefined' ) {
 			LearnDash_disable_assets(true);
 			
 		}});
+	} else if (learndash_video_data.videos_found_provider == 'vooplayer') {
+		//console.log('in vooplayer');
+		if (typeof vooAPI !== 'undefined') {
+			LearnDash_disable_assets(true);
+
+			document.addEventListener('vooPlayerReady', LD_vooPlayerReady, false);
+			function LD_vooPlayerReady(event) {
+				//console.log('in LD_vooPlayerReady');
+				// See https://app.vooplayer.com/docs/api/#vooPlayerReady for event examples.
+				if ((typeof event.detail.video !== 'undefined') && (event.detail.video.length > 0 ) ) {
+					vooAPI(event.detail.video, 'onEnded', null, onVideoEnded);
+				}
+			}
+			
+			function onVideoEnded() {
+				LearnDash_disable_assets(false);
+			}
+		}		
 	} else if ( learndash_video_data.videos_found_provider == 'local' ) {
 		jQuery( document ).ready(function() {
 			//console.log('learndash_video_data[%o]', learndash_video_data.videos_found_provider);

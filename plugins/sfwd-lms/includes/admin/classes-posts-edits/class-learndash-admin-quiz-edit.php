@@ -110,6 +110,8 @@ if ( ( class_exists( 'Learndash_Admin_Post_Edit' ) ) && ( ! class_exists( 'Learn
 						$this->quiz_builder->builder_on_load();
 					}
 				}
+
+				add_filter( 'learndash_header_data', 'LearnDash\Admin\QuizBuilderHelpers\get_quiz_data', 100 );
 			}
 		}
 

@@ -131,3 +131,33 @@ if ( ( ! class_exists( 'Learndash_Admin_Settings_Data_Upgrades' ) ) && ( class_e
 		}
 	}
 }
+
+if ( ! function_exists( 'learndash_get_valid_transient' ) ) {
+	function learndash_get_valid_transient( $transient_key = '' ) {
+		//if ( function_exists( '_deprecated_function' ) ) {
+		//	_deprecated_function( __FUNCTION__, '3.1', 'LDLMS_Transients::get' );
+		//}
+
+		return LDLMS_Transients::get( $transient_key );
+	}
+}
+
+if ( ! function_exists( 'learndash_set_transient' ) ) {
+	function learndash_set_transient( $transient_key = '', $transient_data = '', $transient_expire = MINUTE_IN_SECONDS ) {
+		if ( function_exists( '_deprecated_function' ) ) {
+			_deprecated_function( __FUNCTION__, '3.1', 'LDLMS_Transients::set()' );
+		}
+		
+		return LDLMS_Transients::set( $transient_key, $transient_data, $transient_expire );
+	}
+}
+
+if ( ! function_exists( 'learndash_purge_transients' ) ) {
+	function learndash_purge_transients() {
+		if ( function_exists( '_deprecated_function' ) ) {
+			_deprecated_function( __FUNCTION__, '3.1', 'LDLMS_Transients::purge_all()' );
+		}
+
+		return LDLMS_Transients::purge_all();
+	}
+}

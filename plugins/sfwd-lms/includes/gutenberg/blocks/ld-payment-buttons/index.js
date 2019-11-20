@@ -40,6 +40,9 @@ registerBlockType(
         description: sprintf(_x('This block the %s payment buttons', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: 'cart',
         category: 'learndash-blocks',
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             course_id: {
                 type: 'string',
@@ -48,12 +51,16 @@ registerBlockType(
                 type: 'boolean',
                 default: 1
             },
+            preview_course_id: {
+                type: 'string',
+                default: '',
+            },
             meta: {
                 type: 'object',
             }
         },
         edit: props => {
-			const { attributes: { course_id, preview_show },
+            const { attributes: { course_id, preview_show, preview_course_id },
             	className, setAttributes } = props;
 
             const inspectorControls = (
@@ -76,6 +83,13 @@ registerBlockType(
                             label={__('Show Preview', 'learndash')}
                             checked={!!preview_show}
                             onChange={preview_show => setAttributes({ preview_show })}
+                        />
+                        <TextControl
+                            label={sprintf(_x('%s ID', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course'))}
+                            help={sprintf(_x('Enter a %s ID to test preview', 'placeholder: Course', 'learndash'), ldlms_get_custom_label('course'))}
+                            value={preview_course_id || ''}
+                            type={'number'}
+                            onChange={preview_course_id => setAttributes({ preview_course_id })}
                         />
                     </PanelBody>
                 </InspectorControls>

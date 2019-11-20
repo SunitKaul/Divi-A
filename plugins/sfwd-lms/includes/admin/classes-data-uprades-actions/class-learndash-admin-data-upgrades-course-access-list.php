@@ -153,7 +153,7 @@ if ( ( class_exists( 'Learndash_Admin_Data_Upgrades' ) ) && ( ! class_exists( 'L
 							$this->transient_data = $this->get_transient( $this->transient_key );
 						}
 
-						$this->set_transient( $this->transient_key, $this->transient_data );
+						$this->set_option_cache( $this->transient_key, $this->transient_data );
 					} else {
 						$this->transient_data = $this->get_transient( $this->transient_key );
 						if ( ( ! isset( $this->transient_data['process_courses'] ) ) || ( empty( $this->transient_data['process_courses'] ) ) ) {
@@ -178,7 +178,7 @@ if ( ( class_exists( 'Learndash_Admin_Data_Upgrades' ) ) && ( ! class_exists( 'L
 
 								}
 
-								$this->set_transient( $this->transient_key, $this->transient_data );
+								$this->set_option_cache( $this->transient_key, $this->transient_data );
 
 								if ( $this->out_of_timer() ) {
 									break;

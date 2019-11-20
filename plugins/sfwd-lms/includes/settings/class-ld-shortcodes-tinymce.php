@@ -157,7 +157,11 @@ if ( ! class_exists( 'LearnDash_Shortcodes_TinyMCE' ) ) {
 			if ( ( empty( $fields_args['nonce'] ) ) || ( empty( $fields_args['pagenow'] ) ) ) {
 				die();
 			}
-
+			
+			if ( ( empty( $fields_args['post_type'] ) ) && ( ! empty( $fields_args['typenow'] ) ) ) {
+				$fields_args['post_type'] = $fields_args['typenow'];
+			}
+			
 			if ( ! wp_verify_nonce( $fields_args['nonce'], 'learndash_admin_shortcodes_assets_nonce_' . get_current_user_id() . '_' . $fields_args['pagenow'] ) ) {
 				die();
 			}

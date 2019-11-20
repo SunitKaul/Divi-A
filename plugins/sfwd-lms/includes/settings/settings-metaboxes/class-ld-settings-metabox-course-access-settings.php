@@ -255,7 +255,8 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 				'course_price_type_closed_custom_button_url' => array(
 					'name'      => 'course_price_type_closed_custom_button_url',
 					'label'     => esc_html__( 'Button URL', 'learndash' ),
-					'type'      => 'text',
+					'type'      => 'url',
+					'class'   => 'full-text',
 					'value'     => $this->setting_option_values['course_price_type_closed_custom_button_url'],
 					'help_text' => sprintf(
 						// translators: placeholder: "Take this Course" button label
@@ -422,7 +423,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 					'input_error'    => esc_html__( 'Value should be zero or greater with up to 2 decimal places.', 'learndash' ),
 					'parent_setting' => 'course_points_enabled',
 					'attrs'          => array(
-						'step'        => '1.00',
+						'step'        => 'any',
 						'min'         => '0.00',
 						//'max'         => '10.00',
 						'can_decimal' => 2,
@@ -452,7 +453,7 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 					),
 					'input_error'    => esc_html__( 'Value should be zero or greater with up to 2 decimal places.', 'learndash' ),
 					'attrs'          => array(
-						'step'        => '1.00',
+						'step'        => 'any',
 						'min'         => '0.00',
 						//'max'         => '10.00',
 						'can_decimal' => 2,
@@ -553,6 +554,58 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 					),
 				),
 			);
+
+			/*
+			if ( isset( $_GET['course_access_list_meta'] ) ) {
+				$this->setting_option_fields['course_access_list_enabled']['value'] = 'on';
+				$this->setting_option_fields['course_access_list_enabled']['child_section_state'] = 'open';
+
+				$course_access_list_meta_array = learndash_get_course_users_access_from_meta( get_the_ID() );
+				if ( ! empty( $course_access_list_meta_array ) ) {
+					$course_access_list_meta_array = learndash_convert_course_access_list( $course_access_list_meta_array, true );
+				} else {
+					$course_access_list_meta_array = array();
+				}
+
+				$course_access_list_array = learndash_convert_course_access_list( $this->setting_option_values['course_access_list'], true );
+				
+				error_log('course_access_list_meta_array<pre>'. print_r($course_access_list_meta_array, true) .'</pre>');
+				error_log('course_access_list_array<pre>'. print_r($course_access_list_array, true) .'</pre>');
+				
+				$course_access_list_diff_array = array_diff( $course_access_list_meta_array, $course_access_list_array );
+				if ( ! empty( $course_access_list_diff_array ) ) {
+					$course_access_list_diff_str = learndash_convert_course_access_list( $course_access_list_diff_array );
+				} else {
+					$course_access_list_diff_str = '';
+				}
+
+				$this->setting_option_fields['course_access_list_meta'] = array(
+					'name'           => 'course_access_list_meta',
+					'label'          => esc_html__( 'Show Missing Users', 'learndash' ),
+					'type'           => 'textarea',
+					'value'          => $course_access_list_diff_str,
+					'default'        => '',
+					'parent_setting' => 'course_access_list_enabled',
+					'attrs'          => array(
+						'rows' => '2',
+						'cols' => '57',
+					),
+				);
+			} else {
+				$this->setting_option_fields['course_access_list_meta'] = array(
+					'name'           => 'course_access_list_meta',
+					'label'          => esc_html__( 'Show Missing Users', 'learndash' ),
+					'type'           => 'html',
+					'value'          => '<a href="'. add_query_arg( 'course_access_list_meta', '1' ) . '">' . esc_html( 'click to show missing users', 'learndash' ) .'</a>',
+					'parent_setting' => 'course_access_list_enabled',
+				);
+			}
+			*/
+
+			if ( false === learndash_use_legacy_course_access_list() ) {
+				unset( $this->setting_option_fields['course_access_list_enabled'] ); 
+				unset( $this->setting_option_fields['course_access_list'] ); 
+			}
 
 			$this->setting_option_fields = apply_filters( 'learndash_settings_fields', $this->setting_option_fields, $this->settings_metabox_key );
 

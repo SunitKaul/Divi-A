@@ -215,7 +215,7 @@ if ( ! class_exists( 'LearnDash_Translations' ) ) {
 
 					if ( ( isset( $translation_set['links'] ) ) && ( ! empty( $translation_set['links'] ) ) ) {
 						foreach ( $translation_set['links'] as $link_key => $link_url ) {
-							$url_args = apply_filters( 'learndash_translations_url_args', array() );
+							$url_args = apply_filters( 'learndash_translations_url_args', array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT) );
 
 							$dest_filename = self::get_language_directory( $project, false ) . $project . '-' . $locale . '.' . $link_key;
 							if ( file_exists( $dest_filename ) ) {
@@ -265,7 +265,7 @@ if ( ! class_exists( 'LearnDash_Translations' ) ) {
 
 					if ( ( isset( $translation_set['links'] ) ) && ( ! empty( $translation_set['links'] ) ) ) {
 						foreach ( $translation_set['links'] as $link_key => $link_url ) {
-							$url_args = apply_filters( 'learndash_translations_url_args', array() );
+							$url_args = apply_filters( 'learndash_translations_url_args', array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT) );
 
 							$dest_filename = self::get_language_directory( $project, false ) . $project . '-' . $locale . '.' . $link_key;
 							if ( file_exists( $dest_filename ) ) {

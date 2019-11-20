@@ -627,6 +627,8 @@ if ( ! class_exists( 'LearnDash_Settings_Metabox' ) ) {
 						'prerequisiteQuizList' => $prerequisite_mapper->fetchQuizIds( $pro_quiz_id ),
 						'forms'                => $form_mapper->fetch( $pro_quiz_id ),
 					);
+					$pro_quiz_edit[ $pro_quiz_id ]['quiz']->setPostId( absint( $post->ID ) );
+
 				} else {
 					$pro_quiz_edit[ $pro_quiz_id ] = array(
 						'quiz'                 => $quiz_mapper->fetch( 0 ),
@@ -644,6 +646,7 @@ if ( ! class_exists( 'LearnDash_Settings_Metabox' ) ) {
 						if ( null !== $data ) {
 							if ( ( isset( $data['quiz'] ) ) && ( is_a( $data['quiz'], 'WpProQuiz_Model_Quiz' ) ) ) {
 								$data['quiz']->setId( $pro_quiz_edit[ $pro_quiz_id ]['quiz']->getId() );
+								$data['quiz']->setPostId( $post->ID );
 								$data['quiz']->setName( $pro_quiz_edit[ $pro_quiz_id ]['quiz']->getName() );
 								$data['quiz']->setText( 'AAZZAAZZ' );
 							} else {
@@ -658,10 +661,22 @@ if ( ! class_exists( 'LearnDash_Settings_Metabox' ) ) {
 								$data['prerequisiteQuizList'] = array();
 							}
 
+							if ( isset( $data['_' . learndash_get_post_type_slug( 'quiz' ) ] ) ) {
+								$quiz_postmeta = $data['_' . learndash_get_post_type_slug( 'quiz' ) ];
+								foreach( $this->settings_fields_map as $_key => $_val ) {
+									if ( isset( $data['_' . learndash_get_post_type_slug( 'quiz' ) ][ $_key ] ) ) {
+										$this->setting_option_values[ $_key ] = $data['_' . learndash_get_post_type_slug( 'quiz' ) ][ $_key ];
+									}
+								}
+							} else {
+								$quiz_postmeta = array();
+							}
+
 							$pro_quiz_edit[ $pro_quiz_id ] = array(
 								'quiz'                 => $data['quiz'],
 								'prerequisiteQuizList' => $data['prerequisiteQuizList'],
 								'forms'                => $data['forms'],
+								'quiz_postmeta'        => $quiz_postmeta,
 							);
 						}
 					}

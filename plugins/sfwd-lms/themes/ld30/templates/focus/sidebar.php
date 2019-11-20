@@ -11,7 +11,11 @@ do_action('learndash-focus-sidebar-before', $course_id, $user_id ); ?>
 
         <span class="ld-focus-sidebar-trigger">
             <?php do_action('learndash-focus-sidebar-trigger-before', $course_id, $user_id ); ?>
-            <span class="ld-icon ld-icon-arrow-left"></span>
+            <?php if ( is_rtl() ) { ?>
+			<span class="ld-icon ld-icon-arrow-right"></span>
+			<?php } else { ?>
+			<span class="ld-icon ld-icon-arrow-left"></span>
+			<?php } ?>
             <?php do_action('learndash-focus-sidebar-trigger-after', $course_id, $user_id ); ?>
         </span>
 

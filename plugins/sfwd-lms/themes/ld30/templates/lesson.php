@@ -142,7 +142,8 @@ add_filter( 'comments_array', 'learndash_remove_comments', 1, 2 ); ?>
                     'topics'    => $topics,
                     'quizzes'   => $quizzes,
                     'user_id'   => $user_id,
-                    'is_sample' => ( isset($lesson_settings['sample_lesson']) ? $lesson_settings['sample_lesson'] : false ),
+                    //'is_sample' => ( isset($lesson_settings['sample_lesson']) ? $lesson_settings['sample_lesson'] : false ),
+                    'is_sample' => learndash_is_sample( $lesson )
                 ), true ); ?>
             </div>
 

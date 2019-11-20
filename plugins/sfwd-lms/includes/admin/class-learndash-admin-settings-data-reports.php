@@ -231,7 +231,7 @@ if ( ! class_exists( 'Learndash_Admin_Settings_Data_Reports' ) ) {
 			}
 		}
 
-		public function set_transient( $transient_key = '', $transient_data = '' ) {
+		public function set_option_cache( $transient_key = '', $transient_data = '' ) {
 
 			if ( ! empty( $transient_key ) ) {
 				$options_key = 'learndash_reports_' . $transient_key;

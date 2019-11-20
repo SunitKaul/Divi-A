@@ -391,7 +391,8 @@ function learndash_payment_buttons( $course ) {
 		return 	apply_filters( 'learndash_payment_closed_button', $custom_button, $payment_params );
 
 	} else if ( ! empty( $course_price ) ) {
-		include_once( 'vendor/paypal/enhanced-paypal-shortcodes.php' );
+		//include_once( 'vendor/paypal/enhanced-paypal-shortcodes.php' );
+		include_once( LEARNDASH_LMS_LIBRARY_DIR . '/paypal/enhanced-paypal-shortcodes.php' );
 
 		$paypal_button = '';
 
@@ -554,13 +555,15 @@ function learndash_is_sample( $post ) {
 		return false;
 	}
 
-	if ( $post->post_type == 'sfwd-lessons' ) {
+	if ( $post->post_type == learndash_get_post_type_slug( 'lesson' ) ) {
+		$is_sample = false;
 		if ( learndash_get_setting( $post->ID, 'sample_lesson' ) ) {
-			return true;
+			$is_sample = true;
 		}
+		return apply_filters( 'learndash_lesson_is_sample', $is_sample, $post );
 	}
 
-	if ( $post->post_type == 'sfwd-topic' ) {
+	if ( $post->post_type == learndash_get_post_type_slug( 'topic' ) ) {
 		if ( LearnDash_Settings_Section::get_section_setting('LearnDash_Settings_Courses_Builder', 'shared_steps' ) == 'yes' ) {
 			$course_id = learndash_get_course_id( $post );
 			$lesson_id = learndash_course_get_single_parent_step( $course_id, $post->ID );
@@ -568,13 +571,11 @@ function learndash_is_sample( $post ) {
 			$lesson_id = learndash_get_setting( $post->ID, 'lesson' );
 		}
 		if ( ( isset( $lesson_id ) ) && ( ! empty( $lesson_id ) ) ) {
-			if ( learndash_get_setting( $lesson_id, 'sample_lesson' ) ) {
-				return true;
-			}
+			return learndash_is_sample( $lesson_id );
 		}
 	}
 
-	if ( $post->post_type == 'sfwd-quiz' ) {
+	if ( $post->post_type == learndash_get_post_type_slug( 'quiz' ) ) {
 		if ( LearnDash_Settings_Section::get_section_setting('LearnDash_Settings_Courses_Builder', 'shared_steps' ) == 'yes' ) {
 			$course_id = learndash_get_course_id( $post );
 			$lesson_id = learndash_course_get_single_parent_step( $course_id, $post->ID );
@@ -746,7 +747,12 @@ function learndash_comments_open( $open, $post_id = 0 ) {
 					$_post = get_post( $post_id );
 					if ( ( $_post ) && ( is_a( $_post, 'WP_Post' ) ) && ( 'open' === $_post->comment_status ) ) {
 						if ( ( in_array( $_post->post_type, learndash_get_post_types( 'course_steps' ) ) ) && ( 'ld30' === LearnDash_Theme_Register::get_active_theme_key() ) && ( 'yes' === LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'focus_mode_enabled' ) ) ) {
-							$focus_mode_comments = apply_filters( 'learndash_focus_mode_comments', 'closed', $_post );
+							if ( $open === true ) {
+								$focus_mode_comments = 'open';
+							} else {
+								$focus_mode_comments = 'closed';
+							}
+							$focus_mode_comments = apply_filters( 'learndash_focus_mode_comments', $focus_mode_comments, $_post );
 							if ( 'closed' === $focus_mode_comments ) {
 								$open = false;
 							}
@@ -940,69 +946,10 @@ function array_map_r( $func, $arr) {
     return $arr;
 }
 
-
-/**
- * Utility function to interface with the WordPress get_transient function
- * There have been resent issue where the transients loose the expire setting
- * So this function was created and replaces the direct calls to get_transient
- *
- * This function also allow checking disregard transients all together (see 
- * LEARNDASH_TRANSIENTS_DISABLED define). Or selectively disregard via filter	
- * 
- * @since 2.3.3
- * 
- * @param string $transient_key The transient key to retreive.
- *
- * @return mixed $transient_data the retreived transient data or false if expired. 
- */
-function learndash_get_valid_transient( $transient_key = '' ) {
-	
-	$transient_data = false;
-	
-	if ( !empty( $transient_key ) ) {
-		if ( !apply_filters( 'learndash_transients_disabled', LEARNDASH_TRANSIENTS_DISABLED, $transient_key ) ) { 
-			
-			$transient_data = get_transient( $transient_key );
-			/*
-			if ( $transient_data !== false ) {
-
-				// Added in v2.4 to check if the site is running object cache we don't validate
-				if ( !wp_using_ext_object_cache() ) {
-
-					// If the data return is NOT false we double check it has a valid expired data. 
-					$transient_expire_time = get_option( '_transient_timeout_' . $transient_key );
-			
-					// If the expired time is empty then something is not right in the system. So we 
-					// set the return data to false so it will be regenerated. And just to be sure
-					// we also delete the options for the transient and tranient expire. 
-					if ( ( empty( $transient_expire_time ) ) || ( $transient_expire_time < time() ) ) {
-						$transient_data = false;
-						delete_option('_transient_'. $transient_key );
-						delete_option( '_transient_timeout_' . $transient_key );
-					} 
-				}
-			}
-			*/
-		}
-	}
-	
-	return $transient_data;
-}
-
-function learndash_purge_transients() {
-	if ( !apply_filters( 'learndash_transients_disabled', LEARNDASH_TRANSIENTS_DISABLED, 'learndash_all_purge' ) ) { 
-		global $wpdb;
-		
-		$sql_str = "DELETE FROM ". $wpdb->options." WHERE option_name LIKE '_transient_learndash_%' OR option_name LIKE '_transient_timeout_learndash_%'";
-		//error_log('sql_str['. $sql_str .']');
-		$wpdb->query( $sql_str );
-	}
-}
-
-function learndash_format_course_points( $points ) {
+function learndash_format_course_points( $points, $decimals = 1 ) {
 
 	$points = preg_replace("/[^0-9.]/", '', $points );
-	$points = round( floatval( $points ), apply_filters( 'learndash_course_points_format_round', 1 ) );
+	$points = round( floatval( $points ), apply_filters( 'learndash_course_points_format_round', $decimals ) );
 
 	return floatval( $points );
 }
@@ -1382,12 +1329,20 @@ function learndash_get_total_post_count( $post_type = '' ) {
 		
 		// Convert to array.
 		$post_counts = json_decode( json_encode( $post_counts ), true );
-		
-		if ( ! empty( $post_counts ) ) {
-			foreach( $post_counts as $_count ) {
-				$count_total += absint( $_count );
+
+		/**
+		 * We only count the post status shown in the admin
+		 * @since 3.0.4
+		*/
+		$show_in_admin_post_stati = get_post_stati( array( 'show_in_admin_status_list' => true ) );
+		$show_in_admin_post_stati = apply_filters( 'learndash_admin_post_stati', $show_in_admin_post_stati, $post_type, $post_counts );
+		if ( ! empty( $show_in_admin_post_stati ) ) {
+			foreach( $show_in_admin_post_stati as $post_status ) {
+				if ( isset( $post_counts[ $post_status ] ) ) {
+					$count_total += absint( $post_counts[ $post_status ] );	
+				}
 			}
-		}
+ 		}
 	}
 
 	return $count_total;
@@ -1595,6 +1550,14 @@ add_filter( 'is_protected_meta', 'learndash_is_protected_meta', 30, 3 );
 function learndash_login_menu_items( $menu_items, $menu_args = array() ) {
 
 	foreach ( $menu_items as $menu_key => &$menu_item ) {
+		/**
+		 * Check the properties we need exist and not empty. We shouldn't need to do this 
+		 * since the array of menu items comes from WP. See LEARNDASH-3812.
+		 */
+		if ( ( ! isset( $menu_item->url ) ) || ( empty( $menu_item->url ) ) || ( ! isset( $menu_item->classes ) ) || ( ! is_array( $menu_item->classes ) ) || ( empty( $menu_item->classes ) ) ) {
+			continue;
+		}
+
 		if ( ( strpos( $menu_item->url, '#login' ) !== false ) && ( in_array( 'ld-button', $menu_item->classes ) ) ) {
 			/**
 			 * Allow externals to override processing of menu_item.
@@ -1695,17 +1658,112 @@ $learndash_login_model_html = false;
  */
 function learndash_load_login_modal_html() {
 	global $learndash_login_model_html;
-	if ( function_exists( 'learndash_get_template_part' ) ) {
-		if ( false === $learndash_login_model_html ) {
-			$learndash_login_model_html = learndash_get_template_part( 'modules/login-modal.php', array(), false );
-			if ( false !== $learndash_login_model_html ) {
-				add_action( 'wp_footer', function() {
-					global $learndash_login_model_html;
-					if ( ( isset( $learndash_login_model_html ) ) && ( ! empty( $learndash_login_model_html ) ) ) {
-						echo '<div class="learndash-wrapper learndash-wrapper-login-modal">' . $learndash_login_model_html . '</div>';
-					}
-				});
+
+	// Check that we are running the LD30 theme and login mode enabled. 
+	$active_template_key = LearnDash_Theme_Register::get_active_theme_key();
+	$login_mode_enabled = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'login_mode_enabled' );
+	if ( ( 'ld30' === $active_template_key ) && ( 'yes' === $login_mode_enabled ) ) {
+		
+		// Don't need to load the HTML if the user is already logged in. 
+		if ( ( ! is_user_logged_in() ) && ( function_exists( 'learndash_get_template_part' ) ) ) {
+			if ( false === $learndash_login_model_html ) {
+				$learndash_login_model_html = learndash_get_template_part( 'modules/login-modal.php', array(), false );
+				if ( false !== $learndash_login_model_html ) {
+					add_action( 'wp_footer', function() {
+						global $learndash_login_model_html;
+						if ( ( isset( $learndash_login_model_html ) ) && ( ! empty( $learndash_login_model_html ) ) ) {
+							echo '<div class="learndash-wrapper learndash-wrapper-login-modal">' . $learndash_login_model_html . '</div>';
+						}
+					});
+				}
 			}
+		}
+	}
+}
+
+/**
+ * Add custom classes to body
+ * @since 3.1
+ * @param array $classes Array of current body classes.
+ * @return array $classes.
+ */
+function learndash_body_classes( $classes = array() ) {
+	
+	if ( in_array( get_post_type(), learndash_get_post_types(), true ) ) {
+		$custom_classes = array();
+		$custom_classes[] = 'learndash-cpt';
+		$custom_classes[] = 'learndash-cpt-' . get_post_type();
+
+		if ( true === apply_filters( 'learndash_responsive_video', true, get_post_type(), get_the_ID() ) ) {
+			$custom_classes[] = 'learndash-embed-responsive';
+		}
+
+		$custom_classes = apply_filters( 'learndash_body_classes', $custom_classes, get_post_type(), get_the_ID() );
+		if ( ( ! empty( $custom_classes ) ) && ( is_array( $custom_classes ) ) ) {
+			$classes = array_merge( $classes, $custom_classes );
+			$classes = array_unique( $classes );
+		}
+	}
+
+	return $classes;
+}
+add_filter( 'body_class', 'learndash_body_classes', 100, 1 );
+
+/**
+ * Utility function to recalcuate the length of string vars within serialized data. 
+ * taken from http://lea.verou.me/2011/02/convert-php-serialized-data-to-unicode/
+ * 
+ * @since 3.1
+ * @param string $serialized_text Serialized text. 
+ * @return striing serialized text.
+ */
+function learndash_recount_serialized_bytes( $serialized_text = '' ) {
+	if ( ! empty( $serialized_text ) ) {
+		mb_internal_encoding("UTF-8");
+		mb_regex_encoding("UTF-8");
+
+		mb_ereg_search_init($serialized_text, 's:[0-9]+:"');
+
+		$offset = 0;
+
+		while(preg_match('/s:([0-9]+):"/u', $serialized_text, $matches, PREG_OFFSET_CAPTURE, $offset) ||
+			preg_match('/s:([0-9]+):"/u', $serialized_text, $matches, PREG_OFFSET_CAPTURE, ++$offset)) {
+			$number = $matches[1][0];
+			$pos = $matches[1][1];
+
+			$digits = strlen("$number");
+			$pos_chars = mb_strlen(substr($serialized_text, 0, $pos)) + 2 + $digits;
+
+			$str = mb_substr($serialized_text, $pos_chars, $number);
+
+			$new_number = strlen($str);
+			$new_digits = strlen($new_number);
+
+			if($number != $new_number) {
+				// Change stored number
+				$serialized_text = substr_replace($serialized_text, $new_number, $pos, $digits);
+				$pos += $new_digits - $digits;
+			}
+
+			$offset = $pos + 2 + $new_number;
+		}
+	}
+
+	return $serialized_text;
+}
+
+function learndash_get_single_post( $post_type = '' ) {
+	if ( ( ! empty( $post_type ) ) && ( in_array( $post_type, learndash_get_post_types() ) ) ) {
+		$post_query_args = array(
+			'post_type'      => $post_type,
+			'posts_per_page' => 1,
+			'post_status'    => 'publish',
+			'fields'         => 'ids',
+		);
+
+		$post_query = new WP_Query( $post_query_args );
+		if ( ( is_a( $post_query, 'WP_Query' ) ) && ( property_exists( $post_query, 'posts' ) ) && ( ! empty( $post_query->posts ) ) ) {
+			return $post_query->posts[0];
 		}
 	}
 }

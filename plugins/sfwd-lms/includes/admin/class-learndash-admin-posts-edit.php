@@ -41,6 +41,7 @@ if ( ! class_exists( 'Learndash_Admin_Post_Edit' ) ) {
 			add_action( 'load-post.php', array( $this, 'on_load' ) );
 			add_action( 'load-post-new.php', array( $this, 'on_load' ) );
 			add_action( 'save_post', array( $this, 'save_post' ), 50, 3 );
+			add_filter( 'wp_insert_post_parent', array( $this, 'filter_post_parent' ), 30, 4 );
 
 			add_filter( 'enter_title_here', array( $this, 'gutenberg_placeholder_enter_title_here' ), 30, 2 );
 			add_filter( 'write_your_story', array( $this, 'gutenberg_placeholder_write_your_story' ), 30, 2 );
@@ -323,6 +324,27 @@ if ( ! class_exists( 'Learndash_Admin_Post_Edit' ) ) {
 
 			return true;
 		}
+
+		/**
+		 * Filter post_parent before update/insert. Ensure the post_parent fiel is zero for course post types. 
+		 * @since 3.1
+		 * @param  integer $post_parent Post Parent post ID.
+		 * @param  integer $post_id     Post ID being edited.
+		 * @param  array   $new_postarr Array of updated POST fields to be saved.
+		 * @param  array   $postarr     Array of previous POST fields to be saved.
+		 * @return integer $post_parent
+		 */
+		public function filter_post_parent( $post_parent = 0, $post_id = 0, $new_postarr = array(), $postarr = array() ) {
+			if ( $this->post_type_check() ) {
+				$course_post_types = LDLMS_Post_Types::get_post_types( 'course' );
+				if ( ( ! empty( $course_post_types ) ) && ( in_array( $this->post_type, $course_post_types ) ) ) {
+					$post_parent = 0;
+				}
+			}
+
+			return $post_parent;
+		}
+
 
 		/**
 		 * Register metaboxes for Question edit.

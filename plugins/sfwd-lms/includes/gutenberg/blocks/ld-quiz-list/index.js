@@ -41,6 +41,14 @@ registerBlockType(
 		description: sprintf(_x('This block shows a list of %s.', 'placeholders: quizzes', 'learndash'), ldlms_get_custom_label('quizzes')),
 		icon: 'list-view',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
 		attributes: {
 			orderby: {
 				type: 'string',
@@ -117,9 +125,13 @@ registerBlockType(
 				type: 'boolean',
 				default: true
 			},
+			example_show: {
+				type: 'boolean',
+				default: 0
+			},
 		},
 		edit: function (props) {
-			const { attributes: { orderby, order, per_page, course_id, show_content, show_thumbnail, quiz_category_name, quiz_cat, quiz_categoryselector, quiz_tag, quiz_tag_id, category_name, cat, categoryselector, tag, tag_id, course_grid, col, preview_show },
+			const { attributes: { orderby, order, per_page, course_id, show_content, show_thumbnail, quiz_category_name, quiz_cat, quiz_categoryselector, quiz_tag, quiz_tag_id, category_name, cat, categoryselector, tag, tag_id, course_grid, col, preview_show, example_show },
 				setAttributes } = props;
 
 			let field_show_content = '';

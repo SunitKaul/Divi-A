@@ -36,6 +36,14 @@ registerBlockType(
         description: __( 'This block displays the list of groups users are assigned to as users or leaders.', 'learndash' ),
         icon: 'groups',
         category: 'learndash-blocks',
+        example: {
+            attributes: {
+                example_show: 1,
+            },
+        },
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             user_id: {
                 type: 'string',

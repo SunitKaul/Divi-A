@@ -19,32 +19,32 @@
  */
 function learndash_mark_complete( $post, $atts = array() ) {
 
-	$current_user = wp_get_current_user();
-	$userid       = $current_user->ID;
+	if ( ! is_user_logged_in() ) {
+		return '';
+	}
+	
+	$user_id = get_current_user_id();
 
 	if ( isset( $_POST['sfwd_mark_complete'] ) && isset( $_POST['post'] ) && $post->ID == intval( $_POST['post'] ) ) {
 		return '';
 	}
 
 	$bypass_course_limits_admin_users = false;
-	if ( is_user_logged_in() ) {
-		$user_id = get_current_user_id();
 
-		if ( learndash_is_admin_user( $user_id ) ) {
-			$bypass_course_limits_admin_users = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Section_General_Admin_User', 'bypass_course_limits_admin_users' );
-			if ( 'yes' === $bypass_course_limits_admin_users ) {
-				$bypass_course_limits_admin_users = true;
-			} else {
-				$bypass_course_limits_admin_users = false;
-			}
+
+	if ( learndash_is_admin_user( $user_id ) ) {
+		$bypass_course_limits_admin_users = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Section_General_Admin_User', 'bypass_course_limits_admin_users' );
+		if ( 'yes' === $bypass_course_limits_admin_users ) {
+			$bypass_course_limits_admin_users = true;
 		} else {
 			$bypass_course_limits_admin_users = false;
 		}
-
-		// For logged in users to allow an override filter.
-		$bypass_course_limits_admin_users = apply_filters( 'learndash_prerequities_bypass', $bypass_course_limits_admin_users, $user_id, $post->ID, $post );
-
+	} else {
+		$bypass_course_limits_admin_users = false;
 	}
+
+	// For logged in users to allow an override filter.
+	$bypass_course_limits_admin_users = apply_filters( 'learndash_prerequities_bypass', $bypass_course_limits_admin_users, $user_id, $post->ID, $post );
 
 	$course_id = learndash_get_course_id( $post->ID );
 
@@ -54,19 +54,19 @@ function learndash_mark_complete( $post, $atts = array() ) {
 			$progress = learndash_get_course_progress( null, $post->ID );
 
 			if ( ! empty( $progress['this']->completed ) ) {
-				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['this']->ID, $current_user->ID ) ) {
+				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['this']->ID, $user_id ) ) {
 					return '';
 				}
 			}
 
 			if ( ! empty( $progress['prev'] ) && empty( $progress['prev']->completed ) && learndash_lesson_progression_enabled() ) {
-				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['prev']->ID, $current_user->ID ) ) {
+				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['prev']->ID, $user_id ) ) {
 					return '';
 				}
 			}
 
 			if ( ! learndash_lesson_topics_completed( $post->ID ) ) {
-				if ( ! apply_filters( 'learndash_previous_step_completed', false, $post->ID, $current_user->ID ) ) {
+				if ( ! apply_filters( 'learndash_previous_step_completed', false, $post->ID, $user_id ) ) {
 					return '';
 				}
 			}
@@ -76,13 +76,13 @@ function learndash_mark_complete( $post, $atts = array() ) {
 			$progress = learndash_get_course_progress( null, $post->ID );
 
 			if ( ! empty( $progress['this']->completed ) ) {
-				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['this']->ID, $current_user->ID ) ) {
+				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['this']->ID, $user_id ) ) {
 					return '';
 				}
 			}
 
 			if ( ! empty( $progress['prev'] ) && empty( $progress['prev']->completed ) && learndash_lesson_progression_enabled() ) {
-				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['prev']->ID, $current_user->ID ) ) {
+				if ( ! apply_filters( 'learndash_previous_step_completed', false, $progress['prev']->ID, $user_id ) ) {
 					return '';
 				}
 			}
@@ -97,7 +97,7 @@ function learndash_mark_complete( $post, $atts = array() ) {
 				$lesson = get_post( $lesson_id );
 
 				if ( ! is_previous_complete( $lesson ) ) {
-					if ( ! apply_filters( 'learndash_previous_step_completed', false, $lesson->ID, $current_user->ID ) ) {
+					if ( ! apply_filters( 'learndash_previous_step_completed', false, $lesson->ID, $user_id ) ) {
 						return '';
 					}
 				}
@@ -118,7 +118,7 @@ function learndash_mark_complete( $post, $atts = array() ) {
 			'learndash_lesson_assignment_upload_form.php',
 			array(
 				'course_step_post'                => $post,
-				'user_id'                         => $current_user->ID,
+				'user_id'                         => $user_id,
 				'assignment_upload_error_message' => $learndash_assignment_upload_message,
 			)
 		);
@@ -157,7 +157,7 @@ function learndash_mark_complete( $post, $atts = array() ) {
 			*/
 		}
 
-		if ( ( ! learndash_is_admin_user( $userid ) ) || ( ! $bypass_course_limits_admin_users ) ) {
+		if ( ( ! learndash_is_admin_user( $user_id ) ) || ( ! $bypass_course_limits_admin_users ) ) {
 
 			if ( ! empty( $time ) ) {
 				$time_cookie_key = learndash_forced_lesson_time_cookie_key( $post );
@@ -225,7 +225,7 @@ function learndash_mark_complete( $post, $atts = array() ) {
 
 		$return .= '<form ' . $form_id . ' ' . $form_class . ' method="post" action="">' . $form_fields . '</form>';
 
-		if ( ( ! learndash_is_admin_user( $userid ) ) || ( ! $bypass_course_limits_admin_users ) ) {
+		if ( ( ! learndash_is_admin_user( $user_id ) ) || ( ! $bypass_course_limits_admin_users ) ) {
 			if ( ! empty( $time ) ) {
 				if ( isset( $atts['timer']['id'] ) ) {
 					$timer_id = ' id="' . esc_attr( $atts['timer']['id'] ) . '" ';
@@ -253,7 +253,6 @@ function learndash_mark_complete( $post, $atts = array() ) {
 	 */
 	return apply_filters( 'learndash_mark_complete', $return, $post );
 }
-
 
 
 function learndash_ajax_mark_complete( $quiz_id = null, $lesson_id = null ) {
@@ -1571,11 +1570,11 @@ add_shortcode( 'learndash_course_progress', 'learndash_course_progress' );
  * @param boolean $return_incomplete default false. true to return last imcomplete step.
  * @return mixed boolean default. If $return_incomplete is true will return WP_Post object.
  */
-function is_quiz_accessable( $user_id = null, $post = null, $return_incomplete = false ) {
+function is_quiz_accessable( $user_id = null, $post = null, $return_incomplete = false, $course_id = 0 ) {
 
 	// Allow using the legacy function in case of issues with new logic.
 	if ( ( defined( 'LEARNDASH_IS_QUIZ_ACCESSABLE_LEGACY' ) && ( LEARNDASH_IS_QUIZ_ACCESSABLE_LEGACY === true ) ) ) {
-		return is_quiz_accessable_legacy( $user_id, $post );
+		return is_quiz_accessable_legacy( $user_id, $post, $course_id );
 	}
 
 	if ( empty( $user_id ) ) {
@@ -1599,7 +1598,10 @@ function is_quiz_accessable( $user_id = null, $post = null, $return_incomplete =
 		return;
 	}
 
-	$course_id = learndash_get_course_id( $post );
+	if ( empty( $course_id ) ) {
+		$course_id = learndash_get_course_id( $post );
+	} 
+	$course_id = absint( $course_id );
 
 	// If we have a Quiz but the Quiz is not part of a course then return 1 for valid.
 	if ( empty( $course_id ) ) {
@@ -1768,7 +1770,7 @@ function is_quiz_accessable( $user_id = null, $post = null, $return_incomplete =
 	return 0;
 }
 
-function is_quiz_accessable_legacy( $user_id = null, $post = null ) {
+function is_quiz_accessable_legacy( $user_id = null, $post = null, $course_id = 0 ) {
 	if ( empty( $user_id ) ) {
 		$current_user = wp_get_current_user();
 
@@ -1780,10 +1782,12 @@ function is_quiz_accessable_legacy( $user_id = null, $post = null ) {
 	}
 
 	if ( ( ! empty( $post ) ) && ( $post instanceof WP_Post ) ) {
+		if ( empty( $course_id ) ) {
+			$course_id = learndash_get_course_id( $post );
+		} 
+		$course_id = absint( $course_id );
 
 		if ( LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Courses_Builder', 'shared_steps' ) == 'yes' ) {
-			$course_id = learndash_get_course_id( $post );
-
 			$quiz_lesson = learndash_course_get_single_parent_step( $course_id, $post->ID );
 		} else {
 			$quiz_lesson = learndash_get_setting( $post, 'lesson' );
@@ -1800,7 +1804,6 @@ function is_quiz_accessable_legacy( $user_id = null, $post = null ) {
 			}
 		} else {
 			$course_progress = get_user_meta( $user_id, '_sfwd-course_progress', true );
-			$course_id       = learndash_get_course_id( $post->ID );
 
 			if ( ! empty( $course_progress ) && ! empty( $course_progress[ $course_id ] ) && ! empty( $course_progress[ $course_id ]['total'] ) ) {
 				$completed = intVal( $course_progress[ $course_id ]['completed'] );
@@ -2342,21 +2345,21 @@ function learndash_delete_quiz_progress( $user_id, $quiz_id ) {
 	// Pro Quiz Data
 	$pro_quiz_id = learndash_get_setting( $quiz_id, 'quiz_pro' );
 
-	$ref_ids = $wpdb->get_col( $wpdb->prepare( 'SELECT statistic_ref_id FROM ' . $wpdb->prefix . "wp_pro_quiz_statistic_ref WHERE  user_id = '%d' AND quiz_id = '%d' ", $user_id, $pro_quiz_id ) );
+	$ref_ids = $wpdb->get_col( $wpdb->prepare( 'SELECT statistic_ref_id FROM ' . LDLMS_DB::get_table_name( 'quiz_statistic_ref' ) . " WHERE  user_id = '%d' AND quiz_id = '%d' ", $user_id, $pro_quiz_id ) );
 
 	if ( ! empty( $ref_ids[0] ) ) {
 		$wpdb->delete(
-			$wpdb->prefix . 'wp_pro_quiz_statistic_ref', array(
+			LDLMS_DB::get_table_name( 'quiz_statistic_ref' ), array(
 				'user_id' => $user_id,
 				'quiz_id' => $pro_quiz_id,
 			)
 		);
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'wp_pro_quiz_statistic WHERE statistic_ref_id IN (' . implode( ',', $ref_ids ) . ')' );
+		$wpdb->query( 'DELETE FROM ' . LDLMS_DB::get_table_name( 'quiz_statistic' ) . ' WHERE statistic_ref_id IN (' . implode( ',', $ref_ids ) . ')' );
 	}
 
 	// $wpdb->query("DELETE FROM ".$wpdb->usermeta." WHERE meta_key LIKE 'completed_%' AND user_id = '".$user->ID."'");
 	$wpdb->delete(
-		$wpdb->prefix . 'wp_pro_quiz_toplist', array(
+		LDLMS_DB::get_table_name( 'quiz_toplist' ), array(
 			'user_id' => $user_id,
 			'quiz_id' => $pro_quiz_id,
 		)
@@ -2367,11 +2370,27 @@ function learndash_quiz_remove_user_statistics_by_ref( $ref_id = 0 ) {
 	global $wpdb;
 
 	if ( ! empty( $ref_id ) ) {
-		$wpdb->delete( $wpdb->prefix . 'wp_pro_quiz_statistic_ref', array( 'statistic_ref_id' => $ref_id ) );
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'wp_pro_quiz_statistic WHERE statistic_ref_id =' . $ref_id );
+		$wpdb->delete( LDLMS_DB::get_table_name( 'quiz_statistic_ref' ), array( 'statistic_ref_id' => $ref_id ) );
+		$wpdb->query( 'DELETE FROM ' . LDLMS_DB::get_table_name( 'quiz_statistic' ) . ' WHERE statistic_ref_id =' . $ref_id );
 	}
 }
 
+
+function learndash_quiz_remove_user_toplist( $user_id = 0, $quiz_time = 0, $pro_quizid = 0) {
+	global $wpdb;
+
+	if ( ( ! empty( $user_id ) ) && ( ! empty( $quiz_time ) ) && ( ! empty( $pro_quizid ) ) ) {
+		return $wpdb->delete(
+			LDLMS_DB::get_table_name( 'quiz_toplist' ),
+			array(
+				'user_id' => $user_id,
+				'date'    => $quiz_time,
+				'quiz_id' => $pro_quizid,
+			),
+			array( '%d', '%d', '%d' )
+		);
+	}
+}
 
 
 // Used to set a Course step ( Lesson or Topic only ) back to NOT complete status
@@ -2583,6 +2602,12 @@ function learndash_remove_user_quiz_attempt( $user_id = 0, $args = array() ) {
 				}
 
 				if ( $MATCH_FOUND === true ) {
+					if ( ( isset( $user_quiz['time'] ) ) && ( ! empty( $user_quiz['time'] ) ) ) {
+						if ( ( isset( $user_quiz['pro_quizid'] ) ) && ( ! empty( $user_quiz['pro_quizid'] ) ) ) {
+							learndash_quiz_remove_user_toplist( $user_id, $user_quiz['time'], $user_quiz['pro_quizid'] );
+						}
+					}
+					
 					// If we have a statistics reference we need to remove this set of records.
 					if ( ( isset( $user_quiz['statistic_ref_id'] ) ) && ( ! empty( $user_quiz['statistic_ref_id'] ) ) ) {
 						learndash_quiz_remove_user_statistics_by_ref( $user_quiz['statistic_ref_id'] );

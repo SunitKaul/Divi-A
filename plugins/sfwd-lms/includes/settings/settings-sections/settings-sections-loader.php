@@ -62,6 +62,18 @@ require_once __DIR__ . '/class-ld-settings-section-data-upgrades.php';
 // PayPal tab.
 require_once __DIR__ . '/class-ld-settings-section-paypal.php';
 
+// Support tab.
+require_once __DIR__ . '/class-ld-settings-section-support-learndash.php';
+require_once __DIR__ . '/class-ld-settings-section-support-server.php';
+require_once __DIR__ . '/class-ld-settings-section-support-wordpress.php';
+require_once __DIR__ . '/class-ld-settings-section-support-templates.php';
+require_once __DIR__ . '/class-ld-settings-section-support-database-tables.php';
+require_once __DIR__ . '/class-ld-settings-section-support-wordpress-themes.php';
+require_once __DIR__ . '/class-ld-settings-section-support-wordpress-plugins.php';
+require_once __DIR__ . '/class-ld-settings-section-support-copy-system-info.php';
+require_once __DIR__ . '/class-ld-settings-section-support-data-reset.php';
+
+
 // Translations tab.
 if ( ( defined( 'LEARNDASH_TRANSLATIONS' ) ) && ( LEARNDASH_TRANSLATIONS === true ) ) {
 	require_once __DIR__ . '/class-ld-settings-section-translations-refresh.php';

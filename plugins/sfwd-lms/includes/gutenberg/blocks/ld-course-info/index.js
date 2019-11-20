@@ -41,6 +41,14 @@ registerBlockType(
 		description: sprintf(_x('This block shows the %s and progress for the user.', 'placeholders: courses', 'learndash'), ldlms_get_custom_label('course') ),
 		icon: 'analytics',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
         attributes: {
 			user_id: {
 				type: 'string',
@@ -98,7 +106,6 @@ registerBlockType(
 				type: 'string',
 				default: 'DESC'
 			},
-
 			preview_show: {
 				type: 'boolean',
 				default: true
@@ -106,6 +113,10 @@ registerBlockType(
 			preview_user_id: {
 				type: 'string',
 				default: '',
+			},
+			example_show: {
+				type: 'boolean',
+				default: 0
 			},
 			meta: {
 				type: 'object',

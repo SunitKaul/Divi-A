@@ -112,7 +112,7 @@ if ( !class_exists( 'LearnDash_BitBucket_API' ) ) {
 			
 			$request_url = $this->setup_url_params( $request_url );
 			if ( !empty( $request_url ) ) {
-				$options = array('timeout' => 10);
+				$options = array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT);
 				$response = wp_remote_get( $request_url, $options );
 				if ( is_wp_error( $response ) ) {
 					return $response;
@@ -136,7 +136,7 @@ if ( !class_exists( 'LearnDash_BitBucket_API' ) ) {
 			$request_url = $this->repo_url_base;			
 			$request_url = $this->setup_url_params( $request_url );
 			if ( !empty( $request_url ) ) {
-				$options = array('timeout' => 10);
+				$options = array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT);
 				$response = wp_remote_get( $request_url, $options );
 				if ( is_wp_error( $response ) ) {
 					return $response;
@@ -173,7 +173,7 @@ if ( !class_exists( 'LearnDash_BitBucket_API' ) ) {
 				if ( !empty( $request_url ) ) {
 					//$request_url = 'http://local.learndash.com/_readme.txt';
 
-					$options = array('timeout' => 10);
+					$options = array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT);
 			
 					$response = wp_remote_get( $request_url, $options );
 					if ( is_wp_error( $response ) ) {
@@ -200,7 +200,7 @@ if ( !class_exists( 'LearnDash_BitBucket_API' ) ) {
 			if ( !empty( $plugin_key ) ) {
 				$request_url = $this->readme_url_base .'/'. $plugin_key ."_readme.txt";
 			
-				$options = array('timeout' => 10);
+				$options = array('timeout' => LEARNDASH_HTTP_REMOTE_GET_TIMEOUT);
 		
 				$response = wp_remote_get( $request_url, $options );
 				if ( is_wp_error( $response ) ) {

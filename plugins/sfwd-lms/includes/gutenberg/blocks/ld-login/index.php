@@ -51,6 +51,9 @@ if ( ( class_exists( 'LearnDash_Gutenberg_Block' ) ) && ( ! class_exists( 'Learn
 				'preview_action' => array(
 					'type' => 'string',
 				),
+				'example_show' => array(
+					'type' => 'boolean',
+				),
 			);
 			$this->self_closing = true;
 

@@ -357,14 +357,16 @@ if ( ! class_exists( 'Learndash_Admin_Data_Upgrades' ) ) {
 
 			$last_run_info = esc_html__( 'Last run: none', 'learndash' );
 			if ( ! empty( $data_settings ) ) {
-				$user = get_user_by( 'id', $data_settings['user_id'] );
-				if ( ( $user ) && ( is_a( $user, 'WP_User' ) ) ) {
-					$last_run_info = sprintf(
-						// translators: placeholders: date/time, user name.
-						_x( 'Last run: %1$s by %2$s', 'placeholders: date/time, user name', 'learndash' ),
-						learndash_adjust_date_time_display( $data_settings['last_run'] ),
-						$user->display_name
-					);
+				if ( isset( $data_settings['user_id'] ) ) {
+					$user = get_user_by( 'id', $data_settings['user_id'] );
+					if ( ( $user ) && ( is_a( $user, 'WP_User' ) ) ) {
+						$last_run_info = sprintf(
+							// translators: placeholders: date/time, user name.
+							_x( 'Last run: %1$s by %2$s', 'placeholders: date/time, user name', 'learndash' ),
+							learndash_adjust_date_time_display( $data_settings['last_run'] ),
+							$user->display_name
+						);
+					}
 				}
 			}
 
@@ -470,7 +472,7 @@ if ( ! class_exists( 'Learndash_Admin_Data_Upgrades' ) ) {
 		 * @param string $transient_key Transient key to identify transient.
 		 * @param array  $transient_data Array for transient data.
 		 */
-		protected function set_transient( $transient_key = '', $transient_data = '' ) {
+		protected function set_option_cache( $transient_key = '', $transient_data = '' ) {
 			if ( ! empty( $transient_key ) ) {
 				$options_key = $this->transient_prefix . $transient_key;
 				$options_key = str_replace( '-', '_', $options_key );
@@ -493,9 +495,10 @@ require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-act
 require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-user-activity-db-table.php';
 require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-user-meta-courses.php';
 require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-user-meta-quizzes.php';
-require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-course-access-list.php';
-//require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-rename_wpproquiz-tables.php';
+//require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-course-access-list.php';
 require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-quiz-questions.php';
+require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-course-access-list-convert.php';
+require_once LEARNDASH_LMS_PLUGIN_DIR . 'includes/admin/classes-data-uprades-actions/class-learndash-admin-data-upgrades-rename_wpproquiz-tables.php';
 
 /**
  * Action to let other.

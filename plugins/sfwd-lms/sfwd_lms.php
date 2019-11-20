@@ -3,7 +3,7 @@
  * Plugin Name: LearnDash LMS
  * Plugin URI: http://www.learndash.com
  * Description: LearnDash LMS Plugin - Turn your WordPress site into a learning management system.
- * Version: 3.0.7.1
+ * Version: 3.1
  * Author: LearnDash
  * Author URI: http://www.learndash.com
  * Text Domain: learndash
@@ -17,7 +17,7 @@
 /**
  * LearnDash Version Constant
  */
-define( 'LEARNDASH_VERSION', '3.0.7.1' );
+define( 'LEARNDASH_VERSION', '3.1' );
 define( 'LEARNDASH_SETTINGS_DB_VERSION', '2.5' );
 define( 'LEARNDASH_SETTINGS_TRIGGER_UPGRADE_VERSION', '2.5' );
 define( 'LEARNDASH_LMS_TEXT_DOMAIN', 'learndash' );
@@ -29,6 +29,14 @@ if ( ! defined( 'LEARNDASH_LMS_PLUGIN_URL' ) ) {
 	$url = trailingslashit( WP_PLUGIN_URL . '/' . basename( dirname( __FILE__ ) ) );
 	$url = str_replace( array( 'https://', 'http://' ), array( '//', '//' ), $url );
 	define( 'LEARNDASH_LMS_PLUGIN_URL', $url );
+}
+
+if ( ! defined( 'LEARNDASH_LMS_LIBRARY_DIR' ) ) {
+	define( 'LEARNDASH_LMS_LIBRARY_DIR', trailingslashit( LEARNDASH_LMS_PLUGIN_DIR ) . 'includes/lib' );
+}
+
+if ( ! defined( 'LEARNDASH_LMS_LIBRARY_URL' ) ) {
+	define( 'LEARNDASH_LMS_LIBRARY_URL', trailingslashit( LEARNDASH_LMS_PLUGIN_URL ) . 'includes/lib' );
 }
 
 if ( ! defined( 'LEARNDASH_LMS_PLUGIN_KEY' ) ) {
@@ -58,7 +66,7 @@ if ( ! defined( 'LEARNDASH_BUILDER_DEBUG' ) ) {
 	define( 'LEARNDASH_BUILDER_DEBUG', false );
 }
 
-//define( 'LEARNDASH_SCRIPT_VERSION_TOKEN', 'debug' );
+define( 'LEARNDASH_SCRIPT_VERSION_TOKEN', 'debug' );
 if ( ! defined( 'LEARNDASH_SCRIPT_VERSION_TOKEN' ) ) {
 	if ( defined( 'LEARNDASH_SCRIPT_DEBUG' ) && ( LEARNDASH_SCRIPT_DEBUG === true ) ) {
 		define( 'LEARNDASH_SCRIPT_VERSION_TOKEN', LEARNDASH_VERSION . '-' . time() );
@@ -108,6 +116,14 @@ if ( ! defined( 'LEARNDASH_TRANSLATIONS' ) ) {
 // @since 2.5.5.
 if ( ! defined( 'LEARNDASH_ADDONS_UPDATER' ) ) {
 	define( 'LEARNDASH_ADDONS_UPDATER', true );
+}
+
+if ( ! defined( 'LEARNDASH_HTTP_REMOTE_GET_TIMEOUT' ) ) {
+	define( 'LEARNDASH_HTTP_REMOTE_GET_TIMEOUT', 15 );
+}
+
+if ( ! defined( 'LEARNDASH_HTTP_REMOTE_POST_TIMEOUT' ) ) {
+	define( 'LEARNDASH_HTTP_REMOTE_POST_TIMEOUT', 15 );
 }
 
 if ( ! defined( 'LEARNDASH_LMS_DEFAULT_QUESTION_POINTS' ) ) {
@@ -191,12 +207,24 @@ if ( ! defined( 'LEARNDASH_SETTINGS_HEADER_PANEL' ) ) {
 /**
  * LearnDash Database utility class.
  */
+if ( ! defined( 'LEARNDASH_LMS_DATABASE_PREFIX_SUB' ) ) {
+	define( 'LEARNDASH_LMS_DATABASE_PREFIX_SUB', 'learndash_' );
+}
+if ( ! defined( 'LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB_DEFAULT' ) ) {
+	define( 'LEARNDASH_PROQUIZ_DATABASE_PREFIX_SUB_DEFAULT', 'wp_' );
+}
+
 require_once dirname( __FILE__ ) . '/includes/class-ldlms-db.php';
 
 /**
  * LearnDash Post Types utility class.
  */
 require_once dirname( __FILE__ ) . '/includes/class-ldlms-post-types.php';
+
+/**
+ * LearnDash Transients utility class.
+ */
+require_once dirname( __FILE__ ) . '/includes/class-ldlms-transients.php';
 
 
 /**
@@ -403,7 +431,7 @@ if ( ( defined( 'LEARNDASH_TRANSLATIONS' ) ) && ( LEARNDASH_TRANSLATIONS === tru
 	require_once dirname( __FILE__ ) . '/includes/class-ld-translations.php';
 
 	if ( ! defined( 'LEARNDASH_TRANSLATIONS_URL_BASE' ) ) {
-		define( 'LEARNDASH_TRANSLATIONS_URL_BASE', 'http://translations.learndash.com' );
+		define( 'LEARNDASH_TRANSLATIONS_URL_BASE', 'https://translations.learndash.com' );
 	}
 	if ( ! defined( 'LEARNDASH_TRANSLATIONS_URL_CACHE' ) ) {
 		define( 'LEARNDASH_TRANSLATIONS_URL_CACHE', DAY_IN_SECONDS );

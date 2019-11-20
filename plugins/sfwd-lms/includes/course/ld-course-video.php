@@ -179,7 +179,8 @@ if (!class_exists('Learndash_Course_Video' ) ) {
 			
 			if ( ( isset( $settings['lesson_video_enabled'] ) ) && ( $settings['lesson_video_enabled'] == 'on' ) ) {
 				if ( ( isset( $settings['lesson_video_url'] ) ) && ( !empty( $settings['lesson_video_url'] ) ) ) {
-					
+					// Because some copy/paste can result in leading whitespace. LEARNDASH-3819
+					$settings['lesson_video_url'] = trim( $settings['lesson_video_url'] );
 					$settings['lesson_video_url'] = html_entity_decode( $settings['lesson_video_url'] );
 					
 					// Just to ensure the proper settings are available
@@ -345,6 +346,8 @@ if (!class_exists('Learndash_Course_Video' ) ) {
 							$this->video_data['videos_found_provider'] = 'wistia';
 						} else if ( strpos( $settings['lesson_video_url'], 'amazonaws.com' ) !== false ) {
 							$this->video_data['videos_found_provider'] = 'local';
+						} else if ( strpos( $settings['lesson_video_url'], 'vooplayer' ) !== false ) {
+							$this->video_data['videos_found_provider'] = 'vooplayer';
 						} else if ( strpos( $settings['lesson_video_url'], trailingslashit( get_home_url() ) ) !== false ) {
 							$this->video_data['videos_found_provider'] = 'local';
 						} else {
@@ -368,8 +371,16 @@ if (!class_exists('Learndash_Course_Video' ) ) {
 							$this->video_data['videos_found_type'] = 'embed_shortcode';
 						} else if ( substr( $settings['lesson_video_url'], 0, strlen('[video')  ) == '[video' ) {
 							$this->video_data['videos_found_type'] = 'video_shortcode';
-						} else if ( substr( $settings['lesson_video_url'], 0, strlen('<iframe')  ) == '<iframe' ) {
+						}  else if ( substr( $settings['lesson_video_url'], 0, strlen('<iframe')  ) == '<iframe' ) {
 							$this->video_data['videos_found_type'] = 'iframe';
+						} else {
+							if ( $this->video_data['videos_found_provider'] == 'vooplayer' ) {
+								if ( substr( $settings['lesson_video_url'], 0, strlen('[vooplayer')  ) == '[vooplayer' ) {
+									$this->video_data['videos_found_type'] = 'vooplayer_shortcode';
+								} else {
+									$this->video_data['videos_found_type'] = 'iframe';
+								}
+							}
 						}
 					
 						if ( ( $this->video_data['videos_found_provider'] !== false ) && ( $this->video_data['videos_found_type'] !== false ) ) {
@@ -403,6 +414,15 @@ if (!class_exists('Learndash_Course_Video' ) ) {
 								} else if ( $this->video_data['videos_found_type'] == 'video_shortcode' ) {
 									$this->video_content = do_shortcode( $settings['lesson_video_url'] );
 								} else if ( $this->video_data['videos_found_type'] == 'iframe' ) {
+									$this->video_content = $settings['lesson_video_url'];
+								}
+							} else if ( $this->video_data['videos_found_provider'] == 'vooplayer' ) {
+								if ( $this->video_data['videos_found_type'] == 'vooplayer_shortcode' ) {
+									$this->video_content = do_shortcode( $settings['lesson_video_url'] );
+								} else if ( $this->video_data['videos_found_type'] == 'iframe' ) {
+									//if ( strpos( $settings['lesson_video_url'], '</script>' ) === false ) {
+									//	$settings['lesson_video_url'] = '<script src="https://codehooligans.cdn.vooplayer.com/assets/vooplayer.js"></script>' . $settings['lesson_video_url'];
+									//}
 									$this->video_content = $settings['lesson_video_url'];
 								}
 							}

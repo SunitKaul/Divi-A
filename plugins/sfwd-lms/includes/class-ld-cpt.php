@@ -157,7 +157,7 @@ if ( ! class_exists( 'SFWD_CPT' ) ) {
 				$rewrite_flushed = true;
 				
 				// We set a transient. This is checked during the 'shutdown' action where the rewrites will then be flushed. 
-				set_transient( 'sfwd_lms_rewrite_flush', true );
+				learndash_setup_rewrite_flush();
 			}
 		}
 

@@ -43,7 +43,14 @@ jQuery(document).ready(function($) {
 		closeLoginModal();
 	});
 
+	$('body').on('click', '#ld-comments-post-button', function(e) {
+		$(this).addClass('ld-open');
+		$('#ld-comments-form').removeClass('ld-collapsed');
+		$('textarea#comment').focus();
+	});
+
 	// Close modal if clicking away
+	/*
 	$('body').on('click', function(e) {
 		if ($('.learndash-wrapper').hasClass('ld-modal-open')) {
 			if ( ! $(e.target).parents('.ld-modal').length && (! $(e.target).is('a'))) {
@@ -51,7 +58,8 @@ jQuery(document).ready(function($) {
 			}
 		}
 	});
-
+	*/
+	
 	// Close modal on Esc key
 	$(document).keyup(function(e) {
 	     if (e.keyCode === 27) {
@@ -84,8 +92,11 @@ jQuery(document).ready(function($) {
 	$('.ld-js-register-account').click(function(e) {
 
 		e.preventDefault();
-
+		
+		$('.ld-login-modal-register .ld-modal-text').slideUp('slow');
+		$('.ld-login-modal-register .ld-alert').slideUp('slow');
 		$(this).slideUp('slow', function() {
+			
 			$('#ld-user-register').slideDown('slow');
 		});
 
@@ -336,7 +347,8 @@ jQuery(document).ready(function($) {
 				};
 				var $content = $(this).attr('data-ld-tooltip');
 				var $rel_id = Math.floor((Math.random() * 99999));
-				var $tooltip = '<span id="ld-tooltip-' + $rel_id + '" class="ld-tooltip" style="top:' + elementOffsets.top + 'px; left:' + elementOffsets.left + 'px;">' + $content + '</span>';
+				//var $tooltip = '<span id="ld-tooltip-' + $rel_id + '" class="ld-tooltip" style="top:' + elementOffsets.top + 'px; left:' + elementOffsets.left + 'px;">' + $content + '</span>';
+				var $tooltip = '<span id="ld-tooltip-' + $rel_id + '" class="ld-tooltip">' + $content + '</span>';
 				$(this).attr('data-ld-tooltip-id', $rel_id);
 				$('#learndash-tooltips').append($tooltip);
 				$ctr++;
@@ -369,10 +381,12 @@ jQuery(document).ready(function($) {
 
 	function openLoginModal() {
 		var modal_wrapper = $('.learndash-wrapper-login-modal');
-		if (typeof modal_wrapper !== 'undefined') {
+		if ((typeof modal_wrapper !== 'undefined') && ( modal_wrapper.length ) ) {
 			// Move the model to be first element of the body. See LEARNDASH-3503
 			$(modal_wrapper).prependTo('body');
 			$(modal_wrapper).addClass('ld-modal-open');
+
+			// Removed LEARNDASH-3867 #4
 			$('html, body').animate({
 				scrollTop: $('.ld-modal', modal_wrapper).offset().top
 			}, 50);
@@ -387,18 +401,28 @@ jQuery(document).ready(function($) {
 
 		if ( typeof $tooltips !== 'undefined' ) {
 			setTimeout(function() {
-
+				
 				$tooltips.each(function() {
 					var anchor = $(this);
 					var $rel_id = anchor.attr('data-ld-tooltip-id');
 					$tooltip = $('#ld-tooltip-' + $rel_id);
 
 					if (anchor.hasClass('ld-item-list-item')) {
-						anchor = anchor.find('.ld-item-title');
+						//anchor = anchor.find('.ld-item-title');
+						anchor = anchor.find('.ld-status-icon');
 					}
+					console.log('anchor[%o]', anchor);
+					var parent_focus = jQuery(anchor).parents('.ld-focus-sidebar');
+					console.log('parent_focus[%o]', parent_focus);
+					var left_post = anchor.offset().left + (anchor.outerWidth() + 10);
+					if (parent_focus.length) {
+						left_post = anchor.offset().left + (anchor.outerWidth() -18);
+					} 
+
 					$tooltip.css({
-						'top' : anchor.offset().top,
-						'left' : anchor.offset().left + (anchor.outerWidth() / 2),
+						'top' : anchor.offset().top + -3,
+						//'left' : anchor.offset().left + (anchor.outerWidth() / 2),
+						'left': left_post, //anchor.offset().left + (anchor.outerWidth() +10),
 						'margin-left' : 0,
 						'margin-right' : 0
 					}).removeClass('ld-shifted-left ld-shifted-right');

@@ -36,6 +36,14 @@ registerBlockType(
 		description: __('This block displays User meta field', 'learndash'),
 		icon: 'id',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
 		attributes: {
 			field: {
 				type: 'string',

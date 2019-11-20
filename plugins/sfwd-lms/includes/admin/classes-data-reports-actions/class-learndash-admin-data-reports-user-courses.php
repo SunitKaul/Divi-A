@@ -86,7 +86,8 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Courses' ) ) {
 			
 			$_DOING_INIT = false;
 						
-			require_once( LEARNDASH_LMS_PLUGIN_DIR . 'includes/vendor/parsecsv.lib.php' );
+			//require_once( LEARNDASH_LMS_PLUGIN_DIR . 'includes/vendor/parsecsv.lib.php' );
+			require_once( LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php' );
 			
 			if ( ( isset( $data['nonce'] ) ) && ( !empty( $data['nonce'] ) ) ) {
 				if ( wp_verify_nonce( $data['nonce'], 'learndash-data-reports-'. $this->data_slug .'-'. get_current_user_id() ) ) {
@@ -145,8 +146,7 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Courses' ) ) {
 						$reports_fp = fopen( $this->report_filename, 'w' );
 						fclose($reports_fp);
 						
-						//set_transient( $this->transient_key, $this->transient_data, MINUTE_IN_SECONDS );
-						$this->set_transient( $this->transient_key, $this->transient_data );
+						$this->set_option_cache( $this->transient_key, $this->transient_data );
 						
 						$this->send_report_headers_to_csv();
 						
@@ -182,7 +182,7 @@ if ( !class_exists( 'Learndash_Admin_Data_Reports_Courses' ) ) {
 							foreach( $this->transient_data['users_ids'] as $user_id_idx => $user_id ) {
 						
 								unset( $this->transient_data['users_ids'][$user_id_idx] );
-								$this->set_transient( $this->transient_key, $this->transient_data );
+								$this->set_option_cache( $this->transient_key, $this->transient_data );
 							
 								$report_user = get_user_by('id', $user_id);
 								if ( $report_user !== false ) {

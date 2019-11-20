@@ -59,7 +59,10 @@ switch( $context ) {
                     'course_id' => $course_id
                 ), true );
 
-                $status = ( learndash_is_item_complete() ? 'complete' : 'incomplete' );
+                $status = '';
+                if( is_user_logged_in() ) {
+                    $status = ( learndash_is_item_complete() ? 'complete' : 'incomplete' );
+                }
 
                 learndash_status_bubble( $status ); ?>
 
@@ -82,8 +85,10 @@ switch( $context ) {
                     'course_id' => $course_id
                 ), true );
 
-                $status = ( learndash_is_item_complete() ? 'complete' : 'incomplete' );
-
+                $status = '';
+                if( is_user_logged_in() ) {
+                    $status = ( learndash_is_item_complete() ? 'complete' : 'incomplete' );
+                }
                 learndash_status_bubble( $status ); ?>
 
             </div> <!--/.ld-breadcrumbs-->

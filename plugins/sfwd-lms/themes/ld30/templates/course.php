@@ -164,15 +164,17 @@ $has_lesson_quizzes = learndash_30_has_lesson_quizzes( $course_id, $lessons ); ?
                         </div> <!--/.ld-expand-button-->
                         <?php
                         // TODO @37designs Need to test this
-                        if ( apply_filters( 'learndash_course_steps_expand_all', false, $course_id, 'course_lessons_listing_main' ) ): ?>
+                        if ( apply_filters( 'learndash_course_steps_expand_all', false, $course_id, 'course_lessons_listing_main' ) ) {
+                            ?>
                             <script>
                                 jQuery(document).ready(function(){
-                                    jQuery("<?php echo '#ld-expand-button-' . $course_id; ?>").click();
+                                    setTimeout(function(){
+                                        jQuery("<?php echo '#ld-expand-button-' . $course_id; ?>").trigger('click');
+                                    }, 1000);
                                 });
                             </script>
-                        <?php
-                        endif;
-
+                            <?php
+                        }
                     endif;
 
                     /**

@@ -94,7 +94,7 @@ $quiz_link  = ! empty( $quiz_attempt['post']->ID ) ? learndash_get_step_permalin
                     'content' => learndash_adjust_date_time_display($quiz_attempt['time']),
                     'class'   => ''
                 )
-            ) );
+            ), $quiz_attempt );
             foreach( $quiz_columns as $column ): ?>
                 <div class="<?php echo esc_attr('ld-table-list-column ld-table-list-column-' . $column['id'] . ' ' . $column['class'] ); ?>">
                     <span class="ld-column-label"><?php echo wp_kses_post( $column['id'] ); ?>: </span>

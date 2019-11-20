@@ -340,6 +340,57 @@ if ( ! class_exists( 'LearnDash_Gutenberg_Block' ) ) {
 			return $shortcode_params_str;
 		}
 
+		/**
+		 * Get example user ID. This is used as part of WP 5.3 Gutenberg Block Example / Preview.
+		 *
+		 * @since 3.1
+		 * @return integer $user_id User ID.
+		 */
+		function get_example_user_id() {
+			$user_id = 0;
+			$user_id = apply_filters( 'learndash_gutenberg_block_example_id', $user_id, 'user_id', 'user', $this->block_slug );
+			$user_id = absint( $user_id );
+			if ( ! empty( $user_id ) ) {
+				$user = get_user_by( 'ID', $user_id );
+				if ( ( ! $user ) || ( ! is_a( $user, 'WP_User' ) ) ) {
+					$user_id = 0;
+				}
+			}
+
+			if ( empty( $user_id ) ) {
+				if ( is_user_logged_in() ) {
+					$user_id = get_current_user_id();
+				}
+			}
+
+			return $user_id;
+		}
+
+		/**
+		 * Get example post ID. This is used as part of WP 5.3 Gutenberg Block Example / Preview.
+		 *
+		 * @since 3.1
+		 * @param string $post_type Post Type Slug to retreive.
+		 * @return integer $post_id Post ID.
+		 */
+		function get_example_post_id( $post_type = '' ) {
+			$post_id = 0;
+			$post_id = apply_filters( 'learndash_gutenberg_block_example_id', $post_id, 'post_id', $post_type, $this->block_slug );
+			$post_id = absint( $post_id );
+			if ( ! empty( $post_id ) ) {
+				$_post = get_post( $post_id );
+				if ( ( ! $_post ) || ( ! is_a( $_post, 'WP_Post' ) ) ) {
+					$course_id = 0;
+				}
+			}
+
+			if ( empty( $post_id ) ) {
+				$post_id = learndash_get_single_post( $post_type );
+			}
+
+			return $post_id;
+		}
+
 		// End of functions.
 	}
 }

@@ -49,10 +49,10 @@
 
 
     /**
-     * If the user needs to complete the previous lesson display an alert
+     * If the user needs to complete the previous lesson AND topic display an alert
      *
      */
-    if( $lesson_progression_enabled && ! $previous_topic_completed ):
+    if( $lesson_progression_enabled && ( ! $previous_topic_completed || ! $previous_lesson_completed ) ):
 
     	$previous_item = learndash_get_previous( $post );
 
@@ -84,6 +84,7 @@
             learndash_get_template_part( 'quiz/listing.php', array(
                 'user_id'   => $user_id,
                 'course_id' => $course_id,
+                'lesson_id' => $lesson_id,
                 'quizzes'   => $quizzes,
                 'context'   => 'topic'
             ), true );

@@ -40,6 +40,14 @@ registerBlockType(
 		description: __('This shortcode adds the login button on any page', 'learndash'),
 		icon: 'admin-network',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
         attributes: {
 			login_url: {
 				type: 'string',
@@ -82,9 +90,13 @@ registerBlockType(
 				type: 'string',
 				default: ''
 			},
+			example_show: {
+				type: 'boolean',
+				default: 0
+			},
 		},
         edit: function( props ) {
-			const { attributes: { login_url, login_label, login_placement, login_button, logout_url, logout_label, logout_placement, logout_button, preview_show, preview_action  },
+			const { attributes: { login_url, login_label, login_placement, login_button, logout_url, logout_label, logout_placement, logout_button, preview_show, preview_action, example_show },
             	setAttributes } = props;
 
 			const panelbody_login = (

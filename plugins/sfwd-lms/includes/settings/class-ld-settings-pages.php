@@ -95,6 +95,13 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 		protected $show_quick_links_meta = true;
 
 		/**
+		 * Wether to show wrap all settings in a <form></form>.
+		 *
+		 * @var boolean $settings_form_wrap
+		 */
+		protected $settings_form_wrap = true;
+
+		/**
 		 * Public constructor for class
 		 */
 		public function __construct() {
@@ -262,7 +269,7 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 				delete_user_meta( get_current_user_id(), 'meta-box-order_' . $this->settings_screen_id );
 			}
 
-			do_action( 'learndash-settings-page-load', $this->settings_screen_id );
+			do_action( 'learndash-settings-page-load', $this->settings_screen_id, $this->settings_page_id );
 		}
 
 		/**
@@ -299,7 +306,6 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 			return $columns;
 		}
 
-
 		/**
 		 * Action hook to handle footer JS/CSS added footer
 		 */
@@ -322,10 +328,17 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 							return confirm( confirm_message );
 						}
 					});
+
+					if ( jQuery( '#side-sortables').length ) {
+						if ( jQuery( '#side-sortables div.postbox').length ) {
+							jQuery( '#side-sortables').removeClass('empty-container');
+						}
+					}
 				});
 				//]]>
 			</script>
 			<?php
+			do_action( 'learndash_settings_page_footer_scripts', $this->settings_screen_id, $this->settings_page_id );
 		}
 
 		/**
@@ -338,13 +351,13 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 				<div class="wrap learndash-settings-page-wrap">
 
 					<?php settings_errors(); ?>
-					<?php do_action( 'learndash_settings_page_before_title', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_before_title', $this->settings_screen_id, $this->settings_page_id ); ?>
 					<?php echo $this->get_admin_page_title(); ?>
-					<?php do_action( 'learndash_settings_page_after_title', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_after_title', $this->settings_screen_id, $this->settings_page_id ); ?>
 
-					<?php do_action( 'learndash_settings_page_before_form', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_before_form', $this->settings_screen_id, $this->settings_page_id ); ?>
 					<?php echo $this->get_admin_page_form( true ); ?>
-					<?php do_action( 'learndash_settings_page_inside_form_top', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_inside_form_top', $this->settings_screen_id, $this->settings_page_id ); ?>
 
 						<?php settings_fields( $this->settings_page_id ); ?>
 						<?php wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false ); ?>
@@ -356,17 +369,17 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 									<?php do_meta_boxes( $this->settings_screen_id, 'side', null ); ?>
 								</div>
 								<div id="postbox-container-2" class="postbox-container">
-									<?php do_action( 'learndash_settings_page_before_metaboxes', $this->settings_screen_id ); ?>
+									<?php do_action( 'learndash_settings_page_before_metaboxes', $this->settings_screen_id, $this->settings_page_id ); ?>
 									<?php do_meta_boxes( $this->settings_screen_id, 'normal', null ); ?>
 									<?php do_meta_boxes( $this->settings_screen_id, 'advanced', null ); ?>
-									<?php do_action( 'learndash_settings_page_after_metaboxes', $this->settings_screen_id ); ?>
+									<?php do_action( 'learndash_settings_page_after_metaboxes', $this->settings_screen_id, $this->settings_page_id ); ?>
 								</div>
 							</div>
 							<br class="clear">
 						</div>
-					<?php do_action( 'learndash_settings_page_inside_form_bottom', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_inside_form_bottom', $this->settings_screen_id, $this->settings_page_id ); ?>
 					<?php echo $this->get_admin_page_form( false ); ?>
-					<?php do_action( 'learndash_settings_page_after_form', $this->settings_screen_id ); ?>
+					<?php do_action( 'learndash_settings_page_after_form', $this->settings_screen_id, $this->settings_page_id ); ?>
 				</div>
 				<?php
 
@@ -418,10 +431,12 @@ if ( ! class_exists( 'LearnDash_Settings_Page' ) ) {
 		 * @return string form HTML.
 		 */
 		public function get_admin_page_form( $start = true ) {
-			if ( true === $start ) {
-				return apply_filters( 'learndash_admin_page_form', '<form id="learndash-settings-page-form" method="post" action="options.php">', $start );
-			} else {
-				return apply_filters( 'learndash_admin_page_form', '</form>', $start );
+			if ( true === $this->settings_form_wrap ) {
+				if ( true === $start ) {
+					return apply_filters( 'learndash_admin_page_form', '<form id="learndash-settings-page-form" method="post" action="options.php">', $start );
+				} else {
+					return apply_filters( 'learndash_admin_page_form', '</form>', $start );
+				}
 			}
 		}
 
@@ -440,7 +455,7 @@ function learndash_admin_settings_page_assets() {
 				array(),
 				LEARNDASH_SCRIPT_VERSION_TOKEN
 			);
-			wp_style_add_data( 'learndash-select2-jquery-style', 'rtl', 'replace' );
+			//wp_style_add_data( 'learndash-select2-jquery-style', 'rtl', 'replace' );
 			$learndash_assets_loaded['styles']['learndash-select2-jquery-style'] = __FUNCTION__;
 		}
 

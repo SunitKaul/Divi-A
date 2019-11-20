@@ -40,6 +40,14 @@ registerBlockType(
 		description: sprintf(_x("Displays user's enrolled %1$s, %2$s progress, %3$s scores, and achieved certificates.", 'placeholder: courses, course, quiz', 'learndash'), ldlms_get_custom_label('courses'), ldlms_get_custom_label('course'), ldlms_get_custom_label('quiz') ),
 		icon: 'id-alt',
 		category: 'learndash-blocks',
+		example: {
+			attributes: {
+				example_show: 1,
+			},
+		},
+		supports: {
+			customClassName: false,
+		},
         attributes: {
             per_page: {
 				type: 'string',
@@ -85,9 +93,13 @@ registerBlockType(
 				type: 'string',
 				default: '',
 			},
+			example_show: {
+				type: 'boolean',
+				default: 0
+			},
 		},
         edit: function( props ) {
-			const { attributes: { per_page, orderby, order, course_points_user, expand_all, profile_link, show_header, show_search, show_quizzes, preview_user_id, preview_show },
+			const { attributes: { per_page, orderby, order, course_points_user, expand_all, profile_link, show_header, show_search, show_quizzes, preview_user_id, preview_show, example_show },
             	setAttributes } = props;
 
 			const inspectorControls = (

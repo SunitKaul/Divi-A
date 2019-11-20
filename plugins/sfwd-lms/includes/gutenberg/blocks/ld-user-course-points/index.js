@@ -38,6 +38,14 @@ registerBlockType(
         description: sprintf(_x('This block shows the earned %s points for the user.', 'placeholders: course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: 'chart-area',
         category: 'learndash-blocks',
+        example: {
+            attributes: {
+                example_show: 1,
+            },
+        },
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             user_id: {
                 type: 'string',

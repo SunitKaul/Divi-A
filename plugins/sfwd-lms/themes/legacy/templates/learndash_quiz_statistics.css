@@ -86,3 +86,7 @@
     margin-bottom: 15px;
     padding: 5px;
 }
+
+#wpProQuiz_user_content .wpProQuiz_response:empty {
+	display:none;
+}

@@ -7,9 +7,15 @@ if( !empty($quizzes) ):
      *
      * @since 3.0
      */
-    do_action( 'learndash-' . $context . '-quiz-list-before', get_the_ID(), $course_id, $user_id ); ?>
-
-    <div class="ld-table-list ld-topic-list">
+    do_action( 'learndash-' . $context . '-quiz-list-before', get_the_ID(), $course_id, $user_id );
+    $is_sample = false;
+    if ( ( isset( $lesson_id ) ) && ( ! empty( $lesson_id ) ) ) {
+        $is_sample = learndash_get_setting( $lesson_id, 'sample_lesson' );
+    }
+    $table_class     = 'ld-table-list ld-topic-list'
+                    . ( isset( $is_sample ) && $is_sample == 'on' ? ' is_sample' : '' )
+    ?>
+    <div class="<?php echo $table_class; ?>">
 
         <div class="ld-table-list-header ld-primary-background">
             <?php

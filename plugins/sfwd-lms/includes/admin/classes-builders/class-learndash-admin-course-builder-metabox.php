@@ -900,6 +900,8 @@ if ( ( ! class_exists( 'Learndash_Admin_Metabox_Course_Builder' ) ) && ( class_e
 		 * @param array $query_args array of values for AJAX request.
 		 */
 		public function learndash_builder_selector_step_new( $query_args = array() ) {
+			global $wpdb;
+
 			$reply_data = array();
 			$reply_data['new_steps'] = array();
 
@@ -921,9 +923,17 @@ if ( ( ! class_exists( 'Learndash_Admin_Metabox_Course_Builder' ) ) && ( class_e
 								$post_args['post_title'] = $post_type_object->labels->singular_name;
 							}
 						}
-
 						$new_step_id = wp_insert_post( apply_filters( 'course_builder_selector_new_step_post_args', $post_args ) );
 						if ( $new_step_id ) {
+							/**
+							 * We have to set the guid manually because the one assigned within wp_insert_post is non-unique. 
+							 * See LEARNDASH-3853
+							 */ 
+							$wpdb->update(
+								$wpdb->posts, 
+								array( 'guid' => add_query_arg( array( 'post_type' => $step_set['post_type'], 'p' => $new_step_id ), home_url() ) ),  
+								array( 'ID' => $new_step_id )
+							);
 
 							$reply_data['status'] = true;
 

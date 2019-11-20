@@ -1,7 +1,23 @@
 <?php
 global $post;
-$logo = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'login_logo' ); ?>
-
+$header = array(
+    'logo_alt' => '',
+    'logo_url' => '',
+    'text'     => '',
+    'text_url' => ''   
+);
+$header['logo'] = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Theme_LD30', 'login_logo' ); 
+if ( ! empty( $header['logo'] ) ) { 
+    $header['logo_alt'] = get_post_meta( $header['logo'], '_wp_attachment_image_alt', true );
+    $header['logo_alt'] = apply_filters( 'learndash_focus_header_logo_alt', $header['logo_alt'], $course_id, $user_id );
+    $header['logo_url'] = apply_filters( 'learndash_focus_header_logo_url', get_home_url(), $course_id, $user_id );
+} else {
+    $header['text'] = apply_filters( 'learndash_focus_header_text', '', $course_id, $user_id );
+    if ( ! empty( $header['text'] ) ) {
+        $header['text_url'] = apply_filters( 'learndash_focus_header_text_url', '', $course_id, $user_id );
+    }
+}
+?>
 <div class="ld-focus-header">
 
     <?php do_action('learndash-focus-header-mobile-nav-before', $course_id, $user_id ); ?>
@@ -17,21 +33,45 @@ $logo = LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_The
     <?php do_action('learndash-focus-header-logo-before', $course_id, $user_id ); ?>
 
     <div class="ld-brand-logo">
-        <?php if (!empty($logo)): ?>
-            <img src="<?php echo esc_url(wp_get_attachment_url($logo)); ?>" alt="<?php echo esc_attr(get_post_meta($logo , '_wp_attachment_image_alt', true)); ?>">
-        <?php endif; ?>
+    <?php
+        $header_element = '';
+        if ( ! empty( $header['logo'] ) ) { 
+            if ( ! empty( $header['logo_url'] ) ) {
+                $header_element .= '<a href="'. esc_url( $header['logo_url'] ) . '">';
+            }
+            $header_element .= '<img src="'. esc_url( wp_get_attachment_url( $header['logo'] ) ) .'" alt="' .  esc_html( $header['logo_alt'] ) .'" />';
+            if ( ! empty( $header['logo_url'] ) ) {
+                $header_element .= '</a>';
+            }
+        
+        } else {
+            if ( ! empty( $header['text'] ) ) {
+                if ( ! empty( $header['text_url'] ) ) {
+                    $header_element .= '<a href="' . esc_url( $header['text_url'] ) . '">';
+                }
+                $header_element .= esc_html( $header['text'] );
+                if ( ! empty( $header['text_url'] ) ) {
+                    $header_element .= '</a>';
+                }
+            }
+        }
+        
+        $header_element = apply_filters( 'learndash_focus_header_element', $header_element, $header, $course_id, $user_id );
+        echo $header_element;
+    ?>
     </div>
 
     <?php
     do_action('learndash-focus-header-logo-after', $course_id, $user_id );
 
-    learndash_get_template_part( 'modules/progress.php', array(
-        'course_id' =>  $course_id,
-        'user_id'   =>  $user_id,
-        'context'   =>  'focus'
-    ), true ); ?>
+    if( is_user_logged_in() ) {
+        learndash_get_template_part( 'modules/progress.php', array(
+            'course_id' =>  $course_id,
+            'user_id'   =>  $user_id,
+            'context'   =>  'focus'
+        ), true );
+    }
 
-    <?php
     do_action('learndash-focus-header-nav-before', $course_id, $user_id );
 
     $can_complete    = learndash_30_focus_mode_can_complete();

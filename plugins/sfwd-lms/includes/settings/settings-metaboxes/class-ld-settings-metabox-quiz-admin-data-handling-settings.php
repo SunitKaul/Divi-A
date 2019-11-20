@@ -108,6 +108,8 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 		 * Initialize the metabox settings values.
 		 */
 		public function load_settings_values() {
+			global $pagenow;
+
 			parent::load_settings_values();
 
 			$this->quiz_edit = $this->init_quiz_edit( $this->_post );
@@ -203,7 +205,15 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 						$this->setting_option_values['statisticsOn'] = '';
 					}
 
-					$this->setting_option_values['viewProfileStatistics'] = $this->quiz_edit['quiz']->getViewProfileStatistics();
+					if ( isset( $this->quiz_edit['quiz_postmeta']['viewProfileStatistics'] ) ) {
+						$this->setting_option_values['viewProfileStatistics'] = $this->quiz_edit['quiz_postmeta']['viewProfileStatistics'];
+					} else {
+						if ( 'post-new.php' === $pagenow ) {
+							$this->setting_option_values['viewProfileStatistics'] = true;
+						} else {
+							$this->setting_option_values['viewProfileStatistics'] = $this->quiz_edit['quiz']->getViewProfileStatistics();
+						}
+					}
 					if ( true === $this->setting_option_values['viewProfileStatistics'] ) {
 						$this->setting_option_values['viewProfileStatistics'] = 'on';
 					} else {
@@ -238,7 +248,11 @@ if ( ( class_exists( 'LearnDash_Settings_Metabox' ) ) && ( ! class_exists( 'Lear
 						$this->setting_option_values['email_enabled'] = 'on';
 					}
 
-					$this->setting_option_values['timeLimitCookie'] = $this->quiz_edit['quiz']->getTimeLimitCookie();
+					if ( isset( $this->quiz_edit['quiz_postmeta']['timeLimitCookie'] ) ) {
+						$this->setting_option_values['timeLimitCookie'] = $this->quiz_edit['quiz_postmeta']['timeLimitCookie'];
+					} else {
+						$this->setting_option_values['timeLimitCookie'] = $this->quiz_edit['quiz']->getTimeLimitCookie();
+					}
 					if ( ! empty( $this->setting_option_values['timeLimitCookie'] ) ) {
 						$this->setting_option_values['timeLimitCookie_enabled'] = 'on';
 					} else {

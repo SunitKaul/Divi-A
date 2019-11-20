@@ -62,7 +62,7 @@ if ( ! class_exists( 'LD_REST_Sections_Controller_V1' ) ) {
 		public function update_item( $request ) {
 			$params          = $request->get_params();
 			$course_id       = $params['id'];
-			$sections        = isset( $params['sections'] ) ? $params['sections'] : '';
+			$sections        = isset( $params['sections'] ) ? wp_slash( $params['sections'] ) : '';
 
 			update_post_meta( $course_id, 'course_sections', $sections );
 

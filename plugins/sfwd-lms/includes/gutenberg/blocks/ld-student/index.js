@@ -40,6 +40,9 @@ registerBlockType(
         description: sprintf(_x('This block shows the content if the user is enrolled in the %s.', 'placeholders: course', 'learndash'), ldlms_get_custom_label('course') ),
         icon: 'welcome-learn-more',
         category: 'learndash-blocks',
+        supports: {
+            customClassName: false,
+        },
         attributes: {
             course_id: {
                 type: 'string',

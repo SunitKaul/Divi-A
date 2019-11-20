@@ -1604,168 +1604,195 @@ function learndash_quiz_shortcode( $atts, $content = '', $show_materials = false
 	$course_id = $atts['course_id'] = absint( $atts['course_id'] );
 	$quiz_pro_id = $atts['quiz_pro_id'] = absint( $atts['quiz_pro_id'] );
 
-	$learndash_shortcode_atts['ld_quiz'] = $atts;
+	if ( empty( $atts['quiz_id'] ) ) {
+		return $content;
+	}
+	$quiz_post = get_post( $atts['quiz_id'] );
+	if ( ! is_a( $quiz_post, 'WP_Post' ) ) {
+		return $content;
+	}
 
-	if ( ! empty( $atts['quiz_id'] ) ) {
-		$post = get_post( $atts['quiz_id'] );
-
-		$learndash_shortcode_used = true;
-		
-		$lesson_progression_enabled = false;
-		if ( ( isset( $atts['course_id'] ) ) && ( ! empty( $atts['course_id'] ) ) ) {
-			$lesson_progression_enabled = learndash_lesson_progression_enabled( $atts['course_id'] );
+	if ( empty( $course_id ) ) {
+		if ( LearnDash_Settings_Section::get_section_setting( 'LearnDash_Settings_Courses_Builder', 'shared_steps' ) !== 'yes' ) {
+			$course_id = learndash_get_setting( $quiz_post, 'lesson' );
+			$course_id = absint( $course_id );
+			if ( ! empty( $course_id ) ) {
+				$atts['course_id'] = $course_id;
+			}
 		}
-
-		$has_access = '';
-
-		$user_id = get_current_user_id();
-
-		$quiz_post = get_post( $atts['quiz_id'] );
-		if ( $quiz_post instanceof WP_Post ) {
-			$quiz_settings = learndash_get_setting( $atts['quiz_id'] );
-			$meta = SFWD_CPT_Instance::$instances[ 'sfwd-quiz' ]->get_settings_values( 'sfwd-quiz' );
+	}
+	$learndash_shortcode_atts['ld_quiz'] = $atts;
+	// Clear out any previous 'LDAdvQuiz' data.
+	if ( isset( $learndash_shortcode_atts['LDAdvQuiz'] ) ) {
+		unset( $learndash_shortcode_atts['LDAdvQuiz'] );
+	}
+	$learndash_shortcode_used = true;
 		
-			$show_content = ! ( ! empty( $lesson_progression_enabled ) && ! is_quiz_accessable( $user_id, $quiz_post ) );
-			$attempts_count = 0;
-			$repeats = ( isset( $quiz_settings['repeats'] ) ) ? trim( $quiz_settings['repeats'] ) : '';
-			if ( '' === $repeats ) {
-				if ( ! empty( $quiz_settings['quiz_pro'] ) ) {
-					$quiz_mapper = new WpProQuiz_Model_QuizMapper();
-					$pro_quiz_edit = $quiz_mapper->fetch( $quiz_settings['quiz_pro'] );
-					if ( ( $pro_quiz_edit ) && ( is_a( $pro_quiz_edit, 'WpProQuiz_Model_Quiz' ) ) ) {
-						if ( ( isset( $atts['quiz_id'] ) ) && ( ! empty( $atts['quiz_id'] ) ) ) {
-							$pro_quiz_edit->setPostId( $atts['quiz_id'] );
-						}
+	$lesson_progression_enabled = false;
+	if ( ! empty( $atts['course_id'] ) ) {
+		$lesson_progression_enabled = learndash_lesson_progression_enabled( $atts['course_id'] );
+	}
 
-						if ( $pro_quiz_edit->isQuizRunOnce() ) {
-							$repeats = 0;
-							// Update for later.
-							learndash_update_setting( $quiz_post, 'repeats', $repeats );
-						}
+	$has_access = '';
+
+	$user_id = get_current_user_id();
+
+	$quiz_post = get_post( $atts['quiz_id'] );
+	if ( $quiz_post instanceof WP_Post ) {
+		$quiz_settings = learndash_get_setting( $atts['quiz_id'] );
+		$meta = SFWD_CPT_Instance::$instances[ 'sfwd-quiz' ]->get_settings_values( 'sfwd-quiz' );
+	
+		$show_content = ! ( ! empty( $lesson_progression_enabled ) && ! is_quiz_accessable( $user_id, $quiz_post, false, $course_id ) );
+		$attempts_count = 0;
+		$repeats = ( isset( $quiz_settings['repeats'] ) ) ? trim( $quiz_settings['repeats'] ) : '';
+		if ( '' === $repeats ) {
+			if ( ! empty( $quiz_settings['quiz_pro'] ) ) {
+				$quiz_mapper = new WpProQuiz_Model_QuizMapper();
+				$pro_quiz_edit = $quiz_mapper->fetch( $quiz_settings['quiz_pro'] );
+				if ( ( $pro_quiz_edit ) && ( is_a( $pro_quiz_edit, 'WpProQuiz_Model_Quiz' ) ) ) {
+					if ( ( isset( $atts['quiz_id'] ) ) && ( ! empty( $atts['quiz_id'] ) ) ) {
+						$pro_quiz_edit->setPostId( $atts['quiz_id'] );
+					}
+
+					if ( $pro_quiz_edit->isQuizRunOnce() ) {
+						$repeats = 0;
+						// Update for later.
+						learndash_update_setting( $quiz_post, 'repeats', $repeats );
 					}
 				}
 			}
+		}
 
-			if ( $repeats !== '' ) {
+		if ( $repeats !== '' ) {
 
-				if ( $user_id ) {
-					$usermeta = get_user_meta( $user_id, '_sfwd-quizzes', true );
-					$usermeta = maybe_unserialize( $usermeta );
+			if ( $user_id ) {
+				$usermeta = get_user_meta( $user_id, '_sfwd-quizzes', true );
+				$usermeta = maybe_unserialize( $usermeta );
 
-					if ( ! is_array( $usermeta ) ) { 
-						$usermeta = array();
-					}
+				if ( ! is_array( $usermeta ) ) { 
+					$usermeta = array();
+				}
 
-					if ( ! empty( $usermeta ) )	{
-						foreach ( $usermeta as $k => $v ) {
-							if ( ( intval( $v['quiz'] ) === $atts['quiz_id'] ) ) {
-								if ( ! empty( $atts['course_id'] ) ) {
-									if ( ( isset( $v['course'] ) ) && ( ! empty( $v['course'] ) ) && ( absint( $v['course'] ) === absint( $atts['course_id'] ) ) ) {
-										// Count the number of time the student has taken the quiz where the course_id matches.
-										$attempts_count++;
-									}
-								} elseif ( empty( $atts['course_id'] ) ) {
-									if ( ( isset( $v['course'] ) ) && ( empty( $v['course'] ) ) && ( absint( $v['course'] ) === absint( $atts['course_id'] ) ) ) {
-										// Count the number of time the student has taken the quiz where the course_id is zero.
-										$attempts_count++;
-									}
+				if ( ! empty( $usermeta ) )	{
+					foreach ( $usermeta as $k => $v ) {
+						if ( ( intval( $v['quiz'] ) === $atts['quiz_id'] ) ) {
+							if ( ! empty( $atts['course_id'] ) ) {
+								if ( ( isset( $v['course'] ) ) && ( ! empty( $v['course'] ) ) && ( absint( $v['course'] ) === absint( $atts['course_id'] ) ) ) {
+									// Count the number of time the student has taken the quiz where the course_id matches.
+									$attempts_count++;
+								}
+							} elseif ( empty( $atts['course_id'] ) ) {
+								if ( ( isset( $v['course'] ) ) && ( empty( $v['course'] ) ) && ( absint( $v['course'] ) === absint( $atts['course_id'] ) ) ) {
+									// Count the number of time the student has taken the quiz where the course_id is zero.
+									$attempts_count++;
 								}
 							}
 						}
 					}
 				}
 			}
+		}
 
-			$attempts_left = ( ( $repeats === '' ) || ( absint( $repeats ) >= absint( $attempts_count ) ) );
-			
+		$attempts_left = ( ( $repeats === '' ) || ( absint( $repeats ) >= absint( $attempts_count ) ) );
+		
+		/**
+		 * Filters the quiz attempts left for user.
+		 *
+		 * @since 3.1
+		 *
+		 * @param boolean $attempts_left True is Quiz attempts left. False if none.
+		 * @param integer $attempts_count Number of Quiz attemplts already taken.
+		 * @param integer $user_id ID of User taking Quiz.
+		 * @param integer $quiz_id ID of Quiz being taken.
+		 * @return integer Zero or greater value.
+		 * See example https://bitbucket.org/snippets/learndash/Gjygja
+		 */
+		$attempts_left = apply_filters( 'learndash_quiz_attempts', $attempts_left, absint( $attempts_count ), absint( $user_id ), absint( $quiz_post->ID ) );
+		$attempts_left = absint( $attempts_left );
+
+		if ( ! empty( $lesson_progression_enabled ) && ! is_quiz_accessable( $user_id, $quiz_post, false, $course_id  ) ) {
+			add_filter( 'comments_array', 'learndash_remove_comments', 1, 2 );
+		}
+
+		$materials = '';
+
 			/**
-			 * Filters the quiz attempts left for user.
-			 *
-			 * @since 3.1
-			 *
-			 * @param boolean $attempts_left True is Quiz attempts left. False if none.
-			 * @param integer $attempts_count Number of Quiz attemplts already taken.
-			 * @param integer $user_id ID of User taking Quiz.
-			 * @param integer $quiz_id ID of Quiz being taken.
-			 * @return integer Zero or greater value.
-			 * See example https://bitbucket.org/snippets/learndash/Gjygja
-			 */
-			$attempts_left = apply_filters( 'learndash_quiz_attempts', $attempts_left, absint( $attempts_count ), absint( $user_id ), absint( $quiz_post->ID ) );
-			$attempts_left = absint( $attempts_left );
-
-			if ( ! empty( $lesson_progression_enabled ) && ! is_quiz_accessable( $user_id, $quiz_post ) ) {
-				add_filter( 'comments_array', 'learndash_remove_comments', 1, 2 );
-			}
-
-			$materials = '';
-
-			 /**
-			 * Filter for content access
-			 *
-			 * If not null, will display instead of quiz content
-			 * 
-			 * @since 2.1.0
-			 * 
-			 * @param  string
-			 */
-			$access_message = apply_filters( 'learndash_content_access', null, $quiz_post );
-			if ( ! is_null( $access_message ) ) {
-				$quiz_content = $access_message;
-			} else {
-				if ( true === $show_materials ) {
-					if ( ! empty( $quiz_settings['quiz_materials'] ) ) {
-						$materials = wp_specialchars_decode( $quiz_settings['quiz_materials'], ENT_QUOTES );
-						if ( ! empty( $materials ) ) {
-							$materials = do_shortcode( $materials );
-						}
+		 * Filter for content access
+		 *
+		 * If not null, will display instead of quiz content
+		 * 
+		 * @since 2.1.0
+		 * 
+		 * @param  string
+		 */
+		$access_message = apply_filters( 'learndash_content_access', null, $quiz_post );
+		if ( ! is_null( $access_message ) ) {
+			$quiz_content = $access_message;
+		} else {
+			if ( true === $show_materials ) {
+				if ( ! empty( $quiz_settings['quiz_materials'] ) ) {
+					$materials = wp_specialchars_decode( $quiz_settings['quiz_materials'], ENT_QUOTES );
+					if ( ! empty( $materials ) ) {
+						$materials = do_shortcode( $materials );
 					}
 				}
-				
-				$quiz_content = '';
-				if ( ! empty( $quiz_settings['quiz_pro'] ) ) {
-					$quiz_content = wptexturize(
-						do_shortcode( '[LDAdvQuiz ' . $quiz_settings['quiz_pro'] . ' quiz_pro_id="' . $quiz_settings['quiz_pro'] . '" quiz_id="' . $quiz_post->ID . '"]' )
-					);
-				} 
-
-				 /**
-				 * Filter quiz content
-				 * 
-				 * @since 2.1.0
-				 * 
-				 * @param  string  $quiz_content
-				 */
-				$quiz_content = apply_filters( 'learndash_quiz_content', $quiz_content, $quiz_post );
 			}
+			
+			$quiz_content = '';
+			if ( ! empty( $quiz_settings['quiz_pro'] ) ) {
+				$quiz_settings['lesson'] = 0;
+				$quiz_settings['topic'] = 0;
 
-			$level = ob_get_level();
-			ob_start();
-			$template_file = SFWD_LMS::get_template( 'quiz', null, null, true );
-			if ( ! empty( $template_file ) ) {
-				include $template_file;
-			}
+				if ( ( ! empty( $course_id ) ) && ( ! empty( $quiz_id ) ) ) {
+					$quiz_settings['topic'] = learndash_course_get_single_parent_step( $course_id, $quiz_id, learndash_get_post_type_slug( 'topic' ) );
+					$quiz_settings['topic'] = absint( $quiz_settings['topic'] );
 
-			$content = learndash_ob_get_clean( $level );
-		
-			// Added this defined wrap in v2.1.8 as it was effecting <pre></pre>, <code></code> and other formatting of the content. 
-			// See wrike https://www.wrike.com/open.htm?id=77352698 as to why this define exists
-			if ( ( defined( 'LEARNDASH_NEW_LINE_AND_CR_TO_SPACE' ) ) && ( LEARNDASH_NEW_LINE_AND_CR_TO_SPACE == true ) ) {
+					$quiz_settings['lesson'] = learndash_course_get_single_parent_step( $course_id, $quiz_id, learndash_get_post_type_slug( 'lesson' ) );
+					$quiz_settings['lesson'] = absint( $quiz_settings['lesson'] );
+				}
 
-				// Why is this here? 
-				$content = str_replace( array( "\n", "\r" ), ' ', $content );
-			}
-		
-			$user_has_access = $has_access ? 'user_has_access':'user_has_no_access';
+				$quiz_content = wptexturize(
+					do_shortcode( '[LDAdvQuiz ' . $quiz_settings['quiz_pro'] . ' quiz_pro_id="' . $quiz_settings['quiz_pro'] . '" quiz_id="' . $quiz_post->ID . '" course_id="' . $quiz_settings['course'] . '" lesson_id="' . $quiz_settings['lesson'] . '" topic_id="' . $quiz_settings['topic'] . '"]' )
+				);
+			} 
 
-			 /**
-			 * Filter content to be return inside div
+				/**
+			 * Filter quiz content
 			 * 
 			 * @since 2.1.0
 			 * 
-			 * @param  string  $content 
+			 * @param  string  $quiz_content
 			 */
-			$content = '<div class="learndash ' . $user_has_access . '"  id="learndash_post_' . $quiz_post->ID . '">' . apply_filters( 'learndash_content', $content, $quiz_post ) . '</div>';
+			$quiz_content = apply_filters( 'learndash_quiz_content', $quiz_content, $quiz_post );
 		}
+
+		$level = ob_get_level();
+		ob_start();
+		$template_file = SFWD_LMS::get_template( 'quiz', null, null, true );
+		if ( ! empty( $template_file ) ) {
+			include $template_file;
+		}
+
+		$content = learndash_ob_get_clean( $level );
+	
+		// Added this defined wrap in v2.1.8 as it was effecting <pre></pre>, <code></code> and other formatting of the content. 
+		// See wrike https://www.wrike.com/open.htm?id=77352698 as to why this define exists
+		if ( ( defined( 'LEARNDASH_NEW_LINE_AND_CR_TO_SPACE' ) ) && ( LEARNDASH_NEW_LINE_AND_CR_TO_SPACE == true ) ) {
+
+			// Why is this here? 
+			$content = str_replace( array( "\n", "\r" ), ' ', $content );
+		}
+	
+		$user_has_access = $has_access ? 'user_has_access':'user_has_no_access';
+
+			/**
+		 * Filter content to be return inside div
+		 * 
+		 * @since 2.1.0
+		 * 
+		 * @param  string  $content 
+		 */
+		$content = '<div class="learndash ' . $user_has_access . '"  id="learndash_post_' . $quiz_post->ID . '">' . apply_filters( 'learndash_content', $content, $quiz_post ) . '</div>';
 	}
 	
 	return $content;

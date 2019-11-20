@@ -452,7 +452,7 @@ if ( ! empty( $api->contributors ) ) {
 					<?php } ?>
 				<?php } ?>
 			</div>
-			<div id="section-holder" class="wrap">
+			<div id="section-holder">
 			<?php
 			$wp_version = get_bloginfo( 'version' );
 
